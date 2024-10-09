@@ -1,0 +1,33 @@
+[[tool.poetry.source]]
+name = "pytorch"
+url = "https://download.pytorch.org/whl/cu121"
+priority = "supplemental"
+
+[tool.poetry.group.dev.dependencies]
+black = "^24.10.0"
+flake8 = "^7.1.1"
+isort = "^5.13.2"
+jupyterlab = "^4.2.5"
+pre-commit = "^4.0.1"
+
+[tool.poetry]
+name = "qml-tryout"
+version = "0.1.0"
+description = ""
+authors = ["Manoj E S <manoj.es.professional@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.9 || ^3.10"
+qiskit = {extras = ["visualization"], version = "^1.2.4"}
+torch = {version = "^2.4.1+cu121", source = "pytorch"}
+qiskit-ibm-runtime = "^0.30.0"
+
+
+[tool.isort]
+profile = "black"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
