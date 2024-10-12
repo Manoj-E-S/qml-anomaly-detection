@@ -14,7 +14,7 @@ Follow these steps to set up the `qml-anomaly-detection` project using Poetry:
 
 3. **Install required python version using `pyenv`**
     ```sh
-    pyenv install python3.10
+    pyenv install 3.10
     ```
 
 4. **Clone the qml-anomaly-detection repository**
