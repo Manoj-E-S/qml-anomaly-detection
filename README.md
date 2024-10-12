@@ -1,6 +1,6 @@
 # Project Setup
 
-Follow these steps to set up the `qml-tryout` project using Poetry:
+Follow these steps to set up the `qml-anomaly-detection` project using Poetry:
 
 1. **Install Poetry**:
     ```sh
@@ -14,8 +14,8 @@ Follow these steps to set up the `qml-tryout` project using Poetry:
 
 3. **Create a New Poetry Project**:
     ```sh
-    poetry new qml-tryout
-    cd qml-tryout
+    poetry new qml-anomaly-detection
+    cd qml-anomaly-detection
     ```
 
 4. **Add Dependencies**:

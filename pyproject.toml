@@ -11,7 +11,7 @@ jupyterlab = "^4.2.5"
 pre-commit = "^4.0.1"
 
 [tool.poetry]
-name = "qml-tryout"
+name = "qml-anomaly-detection"
 version = "0.1.0"
 description = ""
 authors = ["Manoj E S <manoj.es.professional@gmail.com>"]
@@ -23,6 +23,8 @@ qiskit = {extras = ["visualization"], version = "^1.2.4"}
 torch = {version = "^2.4.1+cu121", source = "pytorch"}
 qiskit-ibm-runtime = "^0.30.0"
 qiskit-machine-learning = "^0.7.2"
+matplotlib = "^3.9.2"
+seaborn = "^0.13.2"
 
 
 [tool.isort]
