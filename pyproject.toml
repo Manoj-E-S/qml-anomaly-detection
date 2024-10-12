@@ -1,7 +1,12 @@
 [[tool.poetry.source]]
-name = "pytorch"
+name = "pytorch-gpu-cu121"
 url = "https://download.pytorch.org/whl/cu121"
-priority = "supplemental"
+priority = "explicit"
+
+[[tool.poetry.source]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu/torch_stable.html"
+priority = "explicit"
 
 [tool.poetry.group.dev.dependencies]
 black = "^24.10.0"
@@ -20,7 +25,7 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.9 || ^3.10"
 qiskit = {extras = ["visualization"], version = "^1.2.4"}
-torch = {version = "^2.4.1+cu121", source = "pytorch"}
+# torch = {version = "^2.4.1+cu121", source = "pytorch-gpu-cu121"}
 qiskit-ibm-runtime = "^0.30.0"
 qiskit-machine-learning = "^0.7.2"
 matplotlib = "^3.9.2"
