@@ -81,6 +81,16 @@ Follow these steps to set up the `qml-anomaly-detection` project using Poetry:
         poetry run pip install "torch~=2.4.1+cpu" --index-url "https://download.pytorch.org/whl/cpu/torch_stable.html"
         ```
 
+9. **Download the datasets** 
+
+    Download from [here](https://drive.google.com/file/d/1VDZccs-BXxPoLvGIkhFpVfTPiKd4LTWS/view?usp=sharing) and replace the contents in the `datasets` directory to form the following structure<br>
+    /datasets/ <br>
+    ├── ccfraud/ <br>
+    ├── diabetes/ <br>
+    ├── KDD Cup 1999/ <br>
+    └── README.md <br>
+
+
 10. **Run Your Project**:
     ```sh
     poetry shell
