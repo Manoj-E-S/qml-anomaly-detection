@@ -78,7 +78,7 @@ Follow these steps to set up the `qml-anomaly-detection` project using Poetry:
 
         ```sh
         cd qml-anomaly-detection
-        poetry run pip install "torch~=2.4.1+cpu" --index-url "https://download.pytorch.org/whl/cpu/torch_stable.html"
+        poetry run pip install "torch==2.4.1+cpu" --index-url "https://download.pytorch.org/whl/cpu/torch_stable.html"
         ```
 
 9. **Download the datasets** 
