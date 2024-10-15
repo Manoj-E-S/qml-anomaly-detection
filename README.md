@@ -70,7 +70,7 @@ Follow these steps to set up the `qml-anomaly-detection` project using Poetry:
 
             ```sh
             cd qml-anomaly-detection
-            poetry run pip install "torch~=2.4.1+<PLACEHOLDER>" --index-url "https://download.pytorch.org/whl/<PLACEHOLDER>"
+            poetry run pip install "torch==2.4.1+<PLACEHOLDER>" --index-url "https://download.pytorch.org/whl/<PLACEHOLDER>"
             ```
         - *Note:* Replace **PLACEHOLDER** with cuda-appropriate repository. Ex: cu121 (for cuda 12), cu111 (for cuda 11), etc.
     
