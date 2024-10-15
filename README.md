@@ -3,39 +3,55 @@
 Follow these steps to set up the `qml-anomaly-detection` project using Poetry:
 
 1. **Install Poetry**:
+
+    **Linux, macOS, Windows (WSL)**
     ```sh
     curl -sSL https://install.python-poetry.org | python3 -
     ```
+    **Windows Powershell:**
+    ```sh
+    (Invoke-WebRequest -Uri https://install.python-poetry.org -UseBasicParsing).Content | py -
+    ```
+    **Note:** On Windows you must add the pypoetry Scripts path to your `PATH` environment variable. Poetry by default is installed at `%APPDATA%\pypoetry` on Windows.
 
-2. **Configure Poetry to use project directory for Virtual Environment**
+3. **Configure Poetry to use project directory for Virtual Environment**
     ```sh
     poetry config virtualenvs.in-project true
     ```
 
-3. **Install required python version using `pyenv`**
+4. **Install required python version using `pyenv`**
+
+    **Install pyenv:**
+    ```sh
+    sudo apt install -y make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev
+    curl https://pyenv.run/ | bash
+    ```
+    **For Windows, refer to the installation here at https://github.com/pyenv-win/pyenv-win?tab=readme-ov-file#installation**
+   
+    **Install python 3.10:**
     ```sh
     pyenv install 3.10
     ```
 
-4. **Clone the qml-anomaly-detection repository**
+6. **Clone the qml-anomaly-detection repository**
     ```sh
     git clone https://github.com/Manoj-E-S/qml-anomaly-detection.git
     ```
 
-5. **Set python-version as the local(default) version for the project**
+7. **Set python-version as the local(default) version for the project**
     ```sh
     cd qml-anomaly-detection
     pyenv local 3.10
     ```
 
-6. **Install Dependencies under the python-version specified in pyproject.toml**:
+8. **Install Dependencies under the python-version specified in pyproject.toml**:
     ```sh
     cd qml-anomaly-detection
     poetry env use 3.10
     poetry install
     ```
 
-7. **Intall `torch` dependency**
+9. **Intall `torch` dependency**
     1. If cuda is available:
         - Check cuda version on your device
 
@@ -65,7 +81,7 @@ Follow these steps to set up the `qml-anomaly-detection` project using Poetry:
         poetry run pip install "torch~=2.4.1+cpu" --index-url "https://download.pytorch.org/whl/cpu/torch_stable.html"
         ```
 
-8. **Run Your Project**:
+10. **Run Your Project**:
     ```sh
     poetry shell
     python <your_script>.py
