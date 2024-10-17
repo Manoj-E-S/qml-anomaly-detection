@@ -81,9 +81,14 @@ Follow these steps to set up the `qml-anomaly-detection` project using Poetry:
         poetry run pip install "torch==2.4.1+cpu" --index-url "https://download.pytorch.org/whl/cpu/torch_stable.html"
         ```
 
-9. **Download the datasets** 
-
-    Download from [here](https://drive.google.com/file/d/1VDZccs-BXxPoLvGIkhFpVfTPiKd4LTWS/view?usp=sharing) and replace the contents in the `datasets` directory to form the following structure<br>
+9. **Download the datasets**
+    
+    Run the following to install the datasets:
+    ```sh
+    poetry shell
+    python ./datasets/dataset_installer.py
+    ```
+    If for whatever reason running the above script does not properly install the datasets, Manually download them from [here](https://drive.google.com/file/d/1VDZccs-BXxPoLvGIkhFpVfTPiKd4LTWS/view?usp=sharing) and replace the contents in the `datasets` directory to form the following structure:<br>
     /datasets/ <br>
     ├── ccfraud/ <br>
     ├── diabetes/ <br>
@@ -91,7 +96,7 @@ Follow these steps to set up the `qml-anomaly-detection` project using Poetry:
     └── README.md <br>
 
 
-10. **Run Your Project**:
+11. **Run Your Project**:
     ```sh
     poetry shell
     python <your_script>.py
