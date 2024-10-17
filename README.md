@@ -86,7 +86,7 @@ Follow these steps to set up the `qml-anomaly-detection` project using Poetry:
     Run the following to install the datasets:
     ```sh
     poetry shell
-    python ./datasets/dataset_installer.py
+    python datasets/dataset_install.py
     ```
     If for whatever reason running the above script does not properly install the datasets, Manually download them from [here](https://drive.google.com/file/d/1VDZccs-BXxPoLvGIkhFpVfTPiKd4LTWS/view?usp=sharing) and replace the contents in the `datasets` directory to form the following structure:<br>
     /datasets/ <br>
