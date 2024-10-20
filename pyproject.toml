@@ -34,7 +34,6 @@ pandas = "^2.2.3"
 qiskit-aer = "^0.15.1"
 dask = {extras = ["complete"], version = "^2024.9.1"}
 imblearn = "^0.0"
-shap = "^0.46.0"
 
 
 [tool.isort]
