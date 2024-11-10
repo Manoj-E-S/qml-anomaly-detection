@@ -4,6 +4,11 @@ url = "https://download.pytorch.org/whl/cu121"
 priority = "explicit"
 
 [[tool.poetry.source]]
+name = "pytorch-gpu-cu124"
+url = "https://download.pytorch.org/whl/cu124"
+priority = "explicit"
+
+[[tool.poetry.source]]
 name = "pytorch-cpu"
 url = "https://download.pytorch.org/whl/cpu/torch_stable.html"
 priority = "explicit"
