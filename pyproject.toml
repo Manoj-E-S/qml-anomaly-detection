@@ -16,7 +16,7 @@ jupyterlab = "^4.2.5"
 pre-commit = "^4.0.1"
 
 [tool.poetry]
-name = "qml-anomaly-detection"
+name = "cqu"
 version = "0.1.0"
 description = ""
 authors = ["Manoj E S <manoj.es.professional@gmail.com>"]
