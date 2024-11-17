@@ -18,6 +18,17 @@ class Preprocessor:
         self.__validate_file_path()
         self.__read_dataset()
 
+    def write_to(self, file_path: str) -> None:
+        _, extension = os.path.splitext(file_path)
+        extension = extension.lower()
+
+        if extension not in supported_readers:
+            raise ValueError(unsupported_message.format(file_extension=extension))
+
+        method_name = f"to_{supported_readers[extension][1]}"
+        method = getattr(self.dataframe, method_name)
+        method(file_path)
+
     def __validate_file_path(self) -> None:
         if not os.path.exists(self.file_path):
             raise FileNotFoundError(f"File not found: {self.file_path}")
@@ -31,7 +42,7 @@ class Preprocessor:
             )
 
     def __read_dataset(self) -> None:
-        data = supported_readers[self.file_extension](self.file_path)
+        data = supported_readers[self.file_extension][0](self.file_path)
 
         if isinstance(data, list):
             self.dataframe = data[0]

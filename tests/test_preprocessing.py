@@ -1,3 +1,5 @@
+import os
+
 import pytest
 
 import cqu.preprocessing as cqupp
@@ -24,3 +26,14 @@ def test_unsupported_filetype():
         ValueError, match=cqupp.unsupported_message.format(file_extension=".ipynb")
     ):
         pp = cqupp.Preprocessor(invalid_filetype)
+
+
+def test_valid_write_to():
+    pp = cqupp.Preprocessor("datasets/ccfraud/creditcard.csv")
+    output_file = "datasets/ccfraud/creditcard.json"
+
+    pp.write_to(output_file)
+
+    assert os.path.exists(output_file)
+
+    os.remove(output_file)
