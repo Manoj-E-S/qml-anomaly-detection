@@ -9,3 +9,10 @@ supported_readers = {
     ".h5": pd.read_hdf,
     ".html": pd.read_html,
 }
+
+unsupported_message = f"""
+    Unsupported file extension '{{file_extension}}'.
+    Supported extensions are: {', '.join(supported_readers.keys())}
+"""
+
+from .preprocessor import Preprocessor

@@ -2,7 +2,7 @@ import os
 
 import pandas as pd
 
-from . import supported_readers
+from . import supported_readers, unsupported_message
 
 
 class Preprocessor:
@@ -25,13 +25,10 @@ class Preprocessor:
         _, self.file_extension = os.path.splitext(self.file_path)
         self.file_extension = self.file_extension.lower()
 
-        unsupported_message = (
-            f"Unsupported file extension '{self.file_extension}'."
-            f"Supported extensions are: {', '.join(supported_readers.keys())}",
-        )
-
         if self.file_extension not in supported_readers:
-            raise ValueError(unsupported_message)
+            raise ValueError(
+                unsupported_message.format(file_extension=self.file_extension)
+            )
 
     def __read_dataset(self) -> None:
         data = supported_readers[self.file_extension](self.file_path)

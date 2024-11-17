@@ -10,10 +10,10 @@ priority = "explicit"
 
 [tool.poetry.group.dev.dependencies]
 black = "^24.10.0"
-flake8 = "^7.1.1"
 isort = "^5.13.2"
 jupyterlab = "^4.2.5"
 pre-commit = "^4.0.1"
+pytest = "^8.3.3"
 
 [tool.poetry]
 name = "cqu"
