@@ -5,6 +5,7 @@ from typing import Optional, overload
 import pandas as pd
 
 from . import supported_readers, unsupported_message
+from .missing_values import MissingValueStrategies, handle_missing_values
 
 
 class Preprocessor:
@@ -34,6 +35,9 @@ class Preprocessor:
             raise ValueError(
                 "Invalid input type. Please provide a file path or a DataFrame."
             )
+
+    def clean_missing(self, strategy: MissingValueStrategies) -> None:
+        self.dataframe = handle_missing_values(self.dataframe, strategy)
 
     def write_to(self, file_path: str) -> None:
         _, extension = os.path.splitext(file_path)
