@@ -70,7 +70,7 @@ class Preprocessor:
         else:
             self.dataframe = data
 
-    def __handle_columns(self):
+    def __handle_columns(self) -> None:
         self.dataframe.columns = (
             self.dataframe.columns.str.strip()
             .str.lower()

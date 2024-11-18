@@ -15,7 +15,9 @@ class MissingValueStrategies(Enum):
     FILL_NOCB = "fill_nocb"
 
 
-def handle_missing_values(dataframe: pd.DataFrame, strategy: MissingValueStrategies):
+def handle_missing_values(
+    dataframe: pd.DataFrame, strategy: MissingValueStrategies
+) -> pd.DataFrame:
     match strategy:
         case MissingValueStrategies.DROP_ROWS:
             return dataframe.dropna(axis=0)
