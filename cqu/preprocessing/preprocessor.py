@@ -1,4 +1,6 @@
 import os
+import string
+from typing import Optional, overload
 
 import pandas as pd
 
@@ -6,17 +8,32 @@ from . import supported_readers, unsupported_message
 
 
 class Preprocessor:
-    file_path: str
-    file_extension: str
+    file_path: Optional[str]
+    file_extension: Optional[str]
     dataframe: pd.DataFrame
 
-    def __init__(self, file_path: str) -> None:
-        self.file_path = file_path
+    @overload
+    def __init__(self, file_path: str) -> None: ...
+
+    @overload
+    def __init__(self, dataframe: pd.DataFrame) -> None: ...
+
+    def __init__(self, dataset_input: str | pd.DataFrame) -> None:
+        self.file_path = None
         self.file_extension = None
         self.dataframe = None
 
-        self.__validate_file_path()
-        self.__read_dataset()
+        if isinstance(dataset_input, str):
+            self.file_path = dataset_input
+            self.__validate_file_path()
+            self.__read_dataset()
+        elif isinstance(dataset_input, pd.DataFrame):
+            self.dataframe = dataset_input
+            self.__handle_columns()
+        else:
+            raise ValueError(
+                "Invalid input type. Please provide a file path or a DataFrame."
+            )
 
     def write_to(self, file_path: str) -> None:
         _, extension = os.path.splitext(file_path)
@@ -48,3 +65,12 @@ class Preprocessor:
             self.dataframe = data[0]
         else:
             self.dataframe = data
+
+    def __handle_columns(self):
+        self.dataframe.columns = (
+            self.dataframe.columns.str.strip()
+            .str.lower()
+            .str.replace(" ", "_")
+            .str.translate(str.maketrans("", "", string.punctuation.replace("_", "")))
+        )
+        self.dataframe = self.dataframe.loc[:, ~self.dataframe.columns.duplicated()]
