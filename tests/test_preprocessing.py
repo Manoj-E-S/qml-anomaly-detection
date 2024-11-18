@@ -28,6 +28,16 @@ def test_unsupported_filetype():
         pp = cqupp.Preprocessor(invalid_filetype)
 
 
+def test_invalid_write_to():
+    pp = cqupp.Preprocessor("datasets/ccfraud/creditcard.csv")
+    output_file = "datasets/ccfraud/creditcard.docx"
+
+    with pytest.raises(
+        ValueError, match=cqupp.unsupported_message.format(file_extension=".docx")
+    ):
+        pp.write_to(output_file)
+
+
 def test_valid_write_to():
     pp = cqupp.Preprocessor("datasets/ccfraud/creditcard.csv")
     output_file = "datasets/ccfraud/creditcard.json"
