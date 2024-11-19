@@ -30,16 +30,21 @@ class Preprocessor:
             self.__read_dataset()
         elif isinstance(dataset_input, pd.DataFrame):
             self.dataframe = dataset_input
-            self.__handle_columns()
         else:
             raise ValueError(
                 "Invalid input type. Please provide a file path or a DataFrame."
             )
 
+        self.__handle_columns()
         self.dataframe = self.dataframe.infer_objects()
 
+    def get_missing_summary(self) -> Dict[str, int]:
+        return self.dataframe.isnull().sum().to_dict()
+
     @overload
-    def clean_missing(self, strategy: MissingValueStrategies) -> None: ...
+    def clean_missing(
+        self, strategy: MissingValueStrategies = MissingValueStrategies.DROP_COLUMNS
+    ) -> None: ...
 
     @overload
     def clean_missing(self, strategies: Dict[str, MissingValueStrategies]) -> None: ...

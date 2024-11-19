@@ -9,6 +9,7 @@ from . import (
     test_data_MEDIAN,
     test_data_MODE,
     test_data_NOCB,
+    test_data_SAL_LERP_TIME_NOCB,
     test_data_ZERO,
     test_dataframe,
 )
@@ -75,3 +76,29 @@ def test_fill_nocb():
     pp.clean_missing(cqupp.MissingValueStrategies.FILL_NOCB)
 
     assert pp.dataframe.to_dict(orient="list") == test_data_NOCB
+
+
+def test_get_missing_summary():
+    pp = cqupp.Preprocessor(test_dataframe)
+
+    assert pp.get_missing_summary() == {
+        "name": 0,
+        "age": 0,
+        "origin_country": 0,
+        "salary": 1,
+        "company": 0,
+        "time": 2,
+    }
+
+
+def test_fill_lerp_nocb():
+    pp = cqupp.Preprocessor(test_dataframe)
+
+    strategies = {
+        "salary": cqupp.MissingValueStrategies.FILL_LERP,
+        "time": cqupp.MissingValueStrategies.FILL_NOCB,
+    }
+
+    pp.clean_missing(strategies)
+
+    assert pp.dataframe.to_dict(orient="list") == test_data_SAL_LERP_TIME_NOCB

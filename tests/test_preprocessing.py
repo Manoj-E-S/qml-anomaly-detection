@@ -72,4 +72,11 @@ def test_valid_write_to():
 def test_handle_columns():
     pp = cqupp.Preprocessor(test_dataframe)
 
-    assert pp.dataframe.columns.tolist() == ["name", "age", "origin_country", "salary"]
+    assert pp.dataframe.columns.tolist() == [
+        "name",
+        "age",
+        "origin_country",
+        "salary",
+        "company",
+        "time",
+    ]

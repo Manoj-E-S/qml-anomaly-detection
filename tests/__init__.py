@@ -164,4 +164,21 @@ test_data_NOCB = {
     "time": [42943, 42944, 42946, 42946, 42948, 42948, 42949],
 }
 
+test_data_SAL_LERP_TIME_NOCB = {
+    "name": ["Tom", "nick", "krish", "jack", "jill", "bill", "kim"],
+    "age": [20, 21, 19, 18, 22, 23, 24],
+    "origin_country": ["USA", "UK", "IND", "AUS", "USA", "UK", "IND"],
+    "salary": [1000, 2000, 5000, 5500, 6000, 8000, 7000],
+    "company": [
+        "Google",
+        "Microsoft",
+        "Apple",
+        "Amazon",
+        "Google",
+        "Microsoft",
+        "Apple",
+    ],
+    "time": [42943, 42944, 42946, 42946, 42948, 42948, 42949],
+}
+
 test_dataframe = pd.DataFrame(test_data)
