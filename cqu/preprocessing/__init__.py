@@ -13,9 +13,9 @@ Typical usage example:
 { 'v1': 0, 'v2': 0, 'v3': 4, 'time': 6, 'class': 2 }
 
 >>> strategies = { 
-    'v3': cqupp.MissingValueStrategies.FILL_MEDIAN, 
-    'time': cqupp.MissingValueStrategies.FILL_NOCB, 
-    'class': cqupp.MissingValueStrategies.DROP_ROWS 
+        'v3': cqupp.MissingValueStrategies.FILL_MEDIAN, 
+        'time': cqupp.MissingValueStrategies.FILL_NOCB, 
+        'class': cqupp.MissingValueStrategies.DROP_ROWS 
     }
 >>> pp.clean_missing(strategies)
 >>> pp.get_missing_summary()

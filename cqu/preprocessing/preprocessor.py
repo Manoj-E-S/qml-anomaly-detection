@@ -106,8 +106,6 @@ class Preprocessor:
         self.dataframe = self.dataframe.loc[:, ~self.dataframe.columns.duplicated()]
 
     def __handle_duplicate_rows(self, keep: str) -> None:
-        duplicate_rows = self.dataframe.duplicated(keep=keep)
-
-        if duplicate_rows.sum() > 0:
-            self.dataframe = self.dataframe[~duplicate_rows]
-            self.dataframe = self.dataframe.reset_index(drop=True)
+        self.dataframe = self.dataframe.drop_duplicates(keep=keep).reset_index(
+            drop=True
+        )
