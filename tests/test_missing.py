@@ -12,6 +12,7 @@ from . import (
     test_data_MODE,
     test_data_NOCB,
     test_data_SAL_LERP_TIME_DROP,
+    test_data_SAL_LERP_TIME_DROP_ROWS,
     test_data_SAL_LERP_TIME_NOCB,
     test_data_ZERO,
     test_dataframe,
@@ -117,20 +118,6 @@ def test_invalid_column():
         pp.clean_missing(strategies)
 
 
-def test_droprows_invalid():
-    pp = cqupp.Preprocessor(test_dataframe)
-
-    strategies = {
-        "time": cqupp.MissingValueStrategies.DROP_ROWS,
-    }
-
-    with pytest.raises(
-        ValueError,
-        match="DROP_ROWS strategy is not supported for column-specific strategies.",
-    ):
-        pp.clean_missing(strategies)
-
-
 def test_nonnumeric_col_numeric_strategy():
     pp = cqupp.Preprocessor(test_dataframe)
 
@@ -169,3 +156,16 @@ def test_fill_lerp_dropcol():
     pp.clean_missing(strategies)
 
     assert pp.dataframe.to_dict(orient="list") == test_data_SAL_LERP_TIME_DROP
+
+
+def test_fill_lerp_droprows():
+    pp = cqupp.Preprocessor(test_dataframe)
+
+    strategies = {
+        "salary": cqupp.MissingValueStrategies.FILL_LERP,
+        "time": cqupp.MissingValueStrategies.DROP_ROWS,
+    }
+
+    pp.clean_missing(strategies)
+
+    assert pp.dataframe.to_dict(orient="list") == test_data_SAL_LERP_TIME_DROP_ROWS

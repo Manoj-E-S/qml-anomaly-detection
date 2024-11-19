@@ -198,4 +198,19 @@ test_data_SAL_LERP_TIME_DROP = {
     ],
 }
 
+test_data_SAL_LERP_TIME_DROP_ROWS = {
+    "name": ["Tom", "nick", "jack", "bill", "kim"],
+    "age": [20, 21, 18, 23, 24],
+    "origin_country": ["USA", "UK", "AUS", "UK", "IND"],
+    "salary": [1000, 2000, 5500, 8000, 7000],
+    "company": [
+        "Google",
+        "Microsoft",
+        "Amazon",
+        "Microsoft",
+        "Apple",
+    ],
+    "time": [42943, 42944, 42946, 42948, 42949],
+}
+
 test_dataframe = pd.DataFrame(test_data)

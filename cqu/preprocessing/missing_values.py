@@ -34,26 +34,27 @@ def is_strategy_applicable(column: str, strategy: MissingValueStrategies) -> boo
 def handle_single_strategy(
     dataframe: pd.DataFrame, strategy: MissingValueStrategies
 ) -> pd.DataFrame:
-    if strategy == MissingValueStrategies.DROP_ROWS:
-        return dataframe.dropna(axis=0)
-    elif strategy == MissingValueStrategies.DROP_COLUMNS:
-        return dataframe.dropna(axis=1)
-    elif strategy == MissingValueStrategies.FILL_ZERO:
-        return dataframe.fillna(0)
-    elif strategy == MissingValueStrategies.FILL_MEAN:
-        return dataframe.fillna(dataframe.mean(numeric_only=True))
-    elif strategy == MissingValueStrategies.FILL_MEDIAN:
-        return dataframe.fillna(dataframe.median(numeric_only=True))
-    elif strategy == MissingValueStrategies.FILL_MODE:
-        return dataframe.fillna(dataframe.mode().iloc[0])
-    elif strategy == MissingValueStrategies.FILL_LERP:
-        return dataframe.interpolate(method="linear")
-    elif strategy == MissingValueStrategies.FILL_LOCF:
-        return dataframe.ffill()
-    elif strategy == MissingValueStrategies.FILL_NOCB:
-        return dataframe.bfill()
-    else:
-        raise ValueError("Invalid strategy. Please provide a valid strategy.")
+    match strategy:
+        case MissingValueStrategies.DROP_ROWS:
+            return dataframe.dropna(axis=0)
+        case MissingValueStrategies.DROP_COLUMNS:
+            return dataframe.dropna(axis=1)
+        case MissingValueStrategies.FILL_ZERO:
+            return dataframe.fillna(0)
+        case MissingValueStrategies.FILL_MEAN:
+            return dataframe.fillna(dataframe.mean(numeric_only=True))
+        case MissingValueStrategies.FILL_MEDIAN:
+            return dataframe.fillna(dataframe.median(numeric_only=True))
+        case MissingValueStrategies.FILL_MODE:
+            return dataframe.fillna(dataframe.mode().iloc[0])
+        case MissingValueStrategies.FILL_LERP:
+            return dataframe.interpolate(method="linear")
+        case MissingValueStrategies.FILL_LOCF:
+            return dataframe.ffill()
+        case MissingValueStrategies.FILL_NOCB:
+            return dataframe.bfill()
+        case _:
+            raise ValueError("Invalid strategy. Please provide a valid strategy.")
 
 
 @overload
@@ -79,13 +80,9 @@ def handle_missing_values(
             if column not in dataframe.columns:
                 raise ValueError(f"Column '{column}' not found in DataFrame!")
 
-            # YOU WOULD WANT TO DO THIS LIKE DROP ALL ROWS WITH NO CLASS INFO : FIX LATER
             if strategy == MissingValueStrategies.DROP_ROWS:
-                raise ValueError(
-                    "DROP_ROWS strategy is not supported for column-specific strategies."
-                )
-
-            if strategy == MissingValueStrategies.DROP_COLUMNS:
+                dataframe = dataframe.dropna(subset=[column])
+            elif strategy == MissingValueStrategies.DROP_COLUMNS:
                 dataframe = dataframe.drop(columns=[column])
             else:
                 if not is_strategy_applicable(dataframe[column], strategy):
