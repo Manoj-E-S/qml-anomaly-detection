@@ -4,12 +4,13 @@ import pandas as pd
 # Test Dataframes and expected outputs
 
 test_data = {
-    "Name ": ["Tom", "nick", "krish", "jack", "jill", "bill", "kim"],
-    " Age!.": [20, 21, 19, 18, 22, 23, 24],
-    "OriGIn CountR,y": ["USA", "UK", "IND", "AUS", "USA", "UK", "IND"],
-    "    SALARY ": [1000, 2000, 5000, np.nan, 6000, 8000, 7000],
-    "sal.ary": [1000, 2000, 5000, np.nan, 6000, 8000, 7000],
+    "Name ": ["Tom", "Tom", "nick", "krish", "jack", "jill", "bill", "kim"],
+    " Age!.": [20, 20, 21, 19, 18, 22, 23, 24],
+    "OriGIn CountR,y": ["USA", "USA", "UK", "IND", "AUS", "USA", "UK", "IND"],
+    "    SALARY ": [1000, 1000, 2000, 5000, np.nan, 6000, 8000, 7000],
+    "sal.ary": [1000, 1000, 2000, 5000, np.nan, 6000, 8000, 7000],
     "Company": [
+        "Google",
         "Google",
         "Microsoft",
         "Apple",
@@ -18,7 +19,7 @@ test_data = {
         "Microsoft",
         "Apple",
     ],
-    "Time": [42943, 42944, np.nan, 42946, np.nan, 42948, 42949],
+    "Time": [42943, 42943, 42944, np.nan, 42946, np.nan, 42948, 42949],
 }
 
 test_data_DROWS = {

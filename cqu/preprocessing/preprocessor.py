@@ -19,10 +19,17 @@ class Preprocessor:
     @overload
     def __init__(self, dataframe: pd.DataFrame) -> None: ...
 
-    def __init__(self, dataset_input: str | pd.DataFrame) -> None:
+    def __init__(
+        self, dataset_input: str | pd.DataFrame, keep_duplicates: str = "first"
+    ) -> None:
         self.file_path = None
         self.file_extension = None
         self.dataframe = None
+
+        if keep_duplicates not in {"first", "last", False}:
+            raise ValueError(
+                "Invalid value for keep_duplicates. Please provide 'first', 'last', or False."
+            )
 
         if isinstance(dataset_input, str):
             self.file_path = dataset_input
@@ -37,6 +44,7 @@ class Preprocessor:
 
         self.__handle_columns()
         self.dataframe = self.dataframe.infer_objects()
+        self.__handle_duplicate_rows(keep_duplicates)
 
     def get_missing_summary(self) -> Dict[str, int]:
         return self.dataframe.isnull().sum().to_dict()
@@ -96,3 +104,10 @@ class Preprocessor:
             .str.translate(str.maketrans("", "", string.punctuation.replace("_", "")))
         )
         self.dataframe = self.dataframe.loc[:, ~self.dataframe.columns.duplicated()]
+
+    def __handle_duplicate_rows(self, keep: str) -> None:
+        duplicate_rows = self.dataframe.duplicated(keep=keep)
+
+        if duplicate_rows.sum() > 0:
+            self.dataframe = self.dataframe[~duplicate_rows]
+            self.dataframe = self.dataframe.reset_index(drop=True)
