@@ -36,6 +36,8 @@ class Preprocessor:
                 "Invalid input type. Please provide a file path or a DataFrame."
             )
 
+        self.dataframe = self.dataframe.infer_objects()
+
     @overload
     def clean_missing(self, strategy: MissingValueStrategies) -> None: ...
 

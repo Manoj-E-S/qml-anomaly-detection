@@ -35,8 +35,8 @@ def handle_missing_values(
         case MissingValueStrategies.FILL_LERP:
             return dataframe.interpolate(method="linear")
         case MissingValueStrategies.FILL_LOCF:
-            return dataframe.fillna(method="ffill")
+            return dataframe.ffill()
         case MissingValueStrategies.FILL_NOCB:
-            return dataframe.fillna(method="bfill")
+            return dataframe.bfill()
         case _:
             raise ValueError("Invalid strategy. Please provide a valid strategy.")
