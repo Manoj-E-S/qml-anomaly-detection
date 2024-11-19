@@ -53,24 +53,9 @@ class Preprocessor:
         self,
         strategy_or_strategies: (
             MissingValueStrategies | Dict[str, MissingValueStrategies]
-        ),
+        ) = MissingValueStrategies.DROP_COLUMNS,
     ) -> None:
-        if isinstance(strategy_or_strategies, MissingValueStrategies):
-            self.dataframe = handle_missing_values(
-                self.dataframe, strategy_or_strategies
-            )
-        elif isinstance(strategy_or_strategies, dict):
-            for column, strategy in strategy_or_strategies.items():
-                if column not in self.dataframe.columns:
-                    raise ValueError(f"Column '{column}' not found in DataFrame!")
-
-                self.dataframe[column] = handle_missing_values(
-                    self.dataframe[column], strategy
-                )
-        else:
-            raise ValueError(
-                "Invalid input: Provide a single strategy or a dictionary of column-specific strategies."
-            )
+        self.dataframe = handle_missing_values(self.dataframe, strategy_or_strategies)
 
     def write_to(self, file_path: str) -> None:
         _, extension = os.path.splitext(file_path)

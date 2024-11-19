@@ -1,3 +1,5 @@
+import pytest
+
 import cqu.preprocessing as cqupp
 
 from . import (
@@ -9,10 +11,21 @@ from . import (
     test_data_MEDIAN,
     test_data_MODE,
     test_data_NOCB,
+    test_data_SAL_LERP_TIME_DROP,
     test_data_SAL_LERP_TIME_NOCB,
     test_data_ZERO,
     test_dataframe,
 )
+
+
+def test_invalid_strategy():
+    pp = cqupp.Preprocessor(test_dataframe)
+
+    with pytest.raises(
+        ValueError,
+        match="Invalid input: Provide a single strategy or a dictionary of column-specific strategies.",
+    ):
+        pp.clean_missing("invalid_strategy")
 
 
 def test_drop_rows():
@@ -91,6 +104,47 @@ def test_get_missing_summary():
     }
 
 
+def test_invalid_column():
+    pp = cqupp.Preprocessor(test_dataframe)
+
+    strategies = {
+        "invalid_column": cqupp.MissingValueStrategies.FILL_ZERO,
+    }
+
+    with pytest.raises(
+        ValueError, match="Column 'invalid_column' not found in DataFrame!"
+    ):
+        pp.clean_missing(strategies)
+
+
+def test_droprows_invalid():
+    pp = cqupp.Preprocessor(test_dataframe)
+
+    strategies = {
+        "time": cqupp.MissingValueStrategies.DROP_ROWS,
+    }
+
+    with pytest.raises(
+        ValueError,
+        match="DROP_ROWS strategy is not supported for column-specific strategies.",
+    ):
+        pp.clean_missing(strategies)
+
+
+def test_nonnumeric_col_numeric_strategy():
+    pp = cqupp.Preprocessor(test_dataframe)
+
+    strategies = {
+        "name": cqupp.MissingValueStrategies.FILL_ZERO,
+    }
+
+    with pytest.raises(
+        ValueError,
+        match="Strategy 'MissingValueStrategies.FILL_ZERO' is not applicable on non-numeric column 'name'",
+    ):
+        pp.clean_missing(strategies)
+
+
 def test_fill_lerp_nocb():
     pp = cqupp.Preprocessor(test_dataframe)
 
@@ -102,3 +156,16 @@ def test_fill_lerp_nocb():
     pp.clean_missing(strategies)
 
     assert pp.dataframe.to_dict(orient="list") == test_data_SAL_LERP_TIME_NOCB
+
+
+def test_fill_lerp_dropcol():
+    pp = cqupp.Preprocessor(test_dataframe)
+
+    strategies = {
+        "salary": cqupp.MissingValueStrategies.FILL_LERP,
+        "time": cqupp.MissingValueStrategies.DROP_COLUMNS,
+    }
+
+    pp.clean_missing(strategies)
+
+    assert pp.dataframe.to_dict(orient="list") == test_data_SAL_LERP_TIME_DROP
