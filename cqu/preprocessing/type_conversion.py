@@ -14,7 +14,7 @@ def convert_types(
             dataframe[column] = dataframe[column].astype(dtype)
         except ValueError as e:
             raise ValueError(
-                f"Failed to convert column '{column}' to {dtype.__name__}: {e}"
+                f"Failed to convert column '{column}' from {dataframe[column].dtype} to {dtype.__name__}!"
             )
 
     return dataframe

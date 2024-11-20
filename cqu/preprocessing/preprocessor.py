@@ -66,7 +66,7 @@ class Preprocessor:
     ) -> None:
         self.dataframe = handle_missing_values(self.dataframe, strategy_or_strategies)
 
-    def convert_datatypes(self, column_types: Dict[str, Any]) -> None:
+    def convert_dtypes(self, column_types: Dict[str, Any]) -> None:
         self.dataframe = convert_types(self.dataframe, column_types)
 
     def write_to(self, file_path: str) -> None:
