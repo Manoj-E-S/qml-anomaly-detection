@@ -1,11 +1,12 @@
 import os
 import string
-from typing import Any, Dict, Optional, overload
+from typing import Any, Dict, List, Optional, overload
 
 import pandas as pd
 
 from . import supported_readers, unsupported_message
 from .missing_values import MissingValueStrategies, handle_missing_values
+from .standardization import standardize_numeric
 from .type_conversion import convert_types
 
 
@@ -68,6 +69,9 @@ class Preprocessor:
 
     def convert_dtypes(self, column_types: Dict[str, Any]) -> None:
         self.dataframe = convert_types(self.dataframe, column_types)
+
+    def standardize_numeric_data(self, columns: Optional[List[str]] = None) -> None:
+        self.dataframe = standardize_numeric(self.dataframe, columns)
 
     def write_to(self, file_path: str) -> None:
         _, extension = os.path.splitext(file_path)
