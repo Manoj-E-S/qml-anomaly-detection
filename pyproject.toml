@@ -4,6 +4,11 @@ url = "https://download.pytorch.org/whl/cu121"
 priority = "explicit"
 
 [[tool.poetry.source]]
+name = "pytorch-gpu-cu124"
+url = "https://download.pytorch.org/whl/cu124"
+priority = "explicit"
+
+[[tool.poetry.source]]
 name = "pytorch-cpu"
 url = "https://download.pytorch.org/whl/cpu/torch_stable.html"
 priority = "explicit"
@@ -27,12 +32,13 @@ python = "^3.10"
 qiskit = {extras = ["visualization"], version = "^1.2.4"}
 # torch = {version = "^2.4.1+cu121", source = "pytorch-gpu-cu121"}
 qiskit-ibm-runtime = "^0.30.0"
-qiskit-machine-learning = "^0.7.2"
+qiskit-machine-learning = "^0.8.0"
 matplotlib = "^3.9.2"
 seaborn = "^0.13.2"
 pandas = "^2.2.3"
-qiskit-aer = "^0.15.1"
 dask = {extras = ["complete"], version = "^2024.9.1"}
+imblearn = "^0.0"
+qiskit-aer-gpu = "^0.15.1"
 gdown = "^5.2.0"
 openpyxl = "^3.1.5"
 
