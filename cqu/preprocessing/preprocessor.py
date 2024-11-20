@@ -1,11 +1,12 @@
 import os
 import string
-from typing import Dict, Optional, overload
+from typing import Any, Dict, Optional, overload
 
 import pandas as pd
 
 from . import supported_readers, unsupported_message
 from .missing_values import MissingValueStrategies, handle_missing_values
+from .type_conversion import convert_types
 
 
 class Preprocessor:
@@ -64,6 +65,9 @@ class Preprocessor:
         ) = MissingValueStrategies.DROP_COLUMNS,
     ) -> None:
         self.dataframe = handle_missing_values(self.dataframe, strategy_or_strategies)
+
+    def convert_datatypes(self, column_types: Dict[str, Any]) -> None:
+        self.dataframe = convert_types(self.dataframe, column_types)
 
     def write_to(self, file_path: str) -> None:
         _, extension = os.path.splitext(file_path)
