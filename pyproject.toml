@@ -39,6 +39,7 @@ pandas = "^2.2.3"
 dask = {extras = ["complete"], version = "^2024.9.1"}
 imblearn = "^0.0"
 qiskit-aer-gpu = "^0.15.1"
+gdown = "^5.2.0"
 
 
 [tool.isort]
