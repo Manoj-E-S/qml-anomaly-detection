@@ -10,13 +10,13 @@ priority = "explicit"
 
 [tool.poetry.group.dev.dependencies]
 black = "^24.10.0"
-flake8 = "^7.1.1"
 isort = "^5.13.2"
 jupyterlab = "^4.2.5"
 pre-commit = "^4.0.1"
+pytest = "^8.3.3"
 
 [tool.poetry]
-name = "qml-anomaly-detection"
+name = "cqu"
 version = "0.1.0"
 description = ""
 authors = ["Manoj E S <manoj.es.professional@gmail.com>"]
@@ -34,6 +34,7 @@ pandas = "^2.2.3"
 qiskit-aer = "^0.15.1"
 dask = {extras = ["complete"], version = "^2024.9.1"}
 gdown = "^5.2.0"
+openpyxl = "^3.1.5"
 
 
 [tool.isort]

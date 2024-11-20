@@ -133,12 +133,21 @@ We are good to go!
     poetry lock --no-update
     ```
 
-6. **Activate the Virtual Environment**:
+6. **To run the tests**:
+   ```
+   poetry run pytest -s
+   ```
+   Or to run a specific test file:
+   ```
+   poetry run pytest -s test_file.py
+   ```
+
+7. **Activate the Virtual Environment**:
     ```sh
     poetry shell
     ```
 
-7. **Deactivate the Virtual Environment**:
+8. **Deactivate the Virtual Environment**:
     ```sh
     exit
     ```
