@@ -44,9 +44,9 @@ class StringStandardizers(Enum):
 def clean_string(s: str, remove_special_chars: bool = True) -> str:
     if not isinstance(s, str):
         return s
-    s = s.strip().lower()
     if remove_special_chars:
-        s = re.sub(r"[^a-zA-Z0-9\s]", "", s)
+        s = re.sub(r"[^a-zA-Z0-9_\s]", "", s)
+    s = s.strip().lower().replace(" ", "_")
     return s
 
 
