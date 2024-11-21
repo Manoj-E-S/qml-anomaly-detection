@@ -65,7 +65,7 @@ def handle_missing_values(
 
 @overload
 def handle_missing_values(
-    dataframe: pd.DataFrame, strategy: Dict[str, MissingValueStrategies]
+    dataframe: pd.DataFrame, strategies: Dict[str, MissingValueStrategies]
 ) -> pd.DataFrame: ...
 
 

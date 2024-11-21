@@ -6,7 +6,11 @@ import pandas as pd
 
 from . import supported_readers, unsupported_message
 from .missing_values import MissingValueStrategies, handle_missing_values
-from .standardization import standardize_numeric
+from .standardization import (
+    StringStandardizers,
+    standardize_numeric,
+    standardize_strings,
+)
 from .type_conversion import convert_types
 
 
@@ -72,6 +76,24 @@ class Preprocessor:
 
     def standardize_numeric_data(self, columns: Optional[List[str]] = None) -> None:
         self.dataframe = standardize_numeric(self.dataframe, columns)
+
+    @overload
+    def standardize_string_data(
+        self, standardizer: StringStandardizers = StringStandardizers.CLEAN
+    ) -> None: ...
+
+    @overload
+    def standardize_string_data(
+        self, standardizers: Dict[str, StringStandardizers]
+    ) -> None: ...
+
+    def standardize_string_data(
+        self,
+        standardizer: (
+            StringStandardizers | Dict[str, StringStandardizers]
+        ) = StringStandardizers.CLEAN,
+    ) -> None:
+        self.dataframe = standardize_strings(self.dataframe, standardizer)
 
     def write_to(self, file_path: str) -> None:
         _, extension = os.path.splitext(file_path)
