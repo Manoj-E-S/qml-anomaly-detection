@@ -18,7 +18,7 @@ class Preprocessor:
     file_path: Optional[str]
     file_extension: Optional[str]
     dataframe: pd.DataFrame
-    label_mappings: Optional[Dict[str, Dict[str, int]]]
+    label_mappings: Dict[str, Dict[str, int]]
 
     @overload
     def __init__(self, file_path: str) -> None: ...
@@ -32,7 +32,7 @@ class Preprocessor:
         self.file_path = None
         self.file_extension = None
         self.dataframe = None
-        self.label_mappings = None
+        self.label_mappings = {}
 
         if keep_duplicates not in {"first", "last", False}:
             raise ValueError(
@@ -95,7 +95,8 @@ class Preprocessor:
             StringStandardizers | Dict[str, StringStandardizers]
         ) = StringStandardizers.CLEAN,
     ) -> None:
-        self.dataframe = standardize_strings(self.dataframe, standardizer)
+        self.dataframe, mappings = standardize_strings(self.dataframe, standardizer)
+        self.label_mappings.update(mappings)
 
     def write_to(self, file_path: str) -> None:
         _, extension = os.path.splitext(file_path)

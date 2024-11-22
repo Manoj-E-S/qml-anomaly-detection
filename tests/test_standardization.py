@@ -56,3 +56,8 @@ def test_string_std_label_encode():
         "age": [25, 30, 35],
         "city": [2, 1, 0],
     }
+
+    assert pp.label_mappings == {
+        "name": {"4john_smith": 0, "jane_doe": 1, "john_doe34": 2},
+        "city": {"chicago": 0, "los_angeles": 1, "new_york": 2},
+    }
