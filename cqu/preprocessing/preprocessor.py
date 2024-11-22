@@ -18,6 +18,7 @@ class Preprocessor:
     file_path: Optional[str]
     file_extension: Optional[str]
     dataframe: pd.DataFrame
+    label_mappings: Optional[Dict[str, Dict[str, int]]]
 
     @overload
     def __init__(self, file_path: str) -> None: ...
@@ -31,6 +32,7 @@ class Preprocessor:
         self.file_path = None
         self.file_extension = None
         self.dataframe = None
+        self.label_mappings = None
 
         if keep_duplicates not in {"first", "last", False}:
             raise ValueError(

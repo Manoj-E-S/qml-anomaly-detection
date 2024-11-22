@@ -1,6 +1,6 @@
 import re
 from enum import Enum
-from typing import Dict, List, Optional, overload
+from typing import Dict, List, Optional, Tuple, overload
 
 import pandas as pd
 from sklearn.preprocessing import (
@@ -52,7 +52,7 @@ def clean_string(s: str, remove_special_chars: bool = True) -> str:
 
 def apply_standardizer(
     series: pd.Series, standardizer: StringStandardizers
-) -> pd.Series | pd.DataFrame:
+) -> pd.Series | pd.DataFrame | Tuple[pd.Series, Dict[str, int]]:
     match standardizer:
         case StringStandardizers.CLEAN:
             return series.apply(lambda x: clean_string(x, remove_special_chars=True))
@@ -60,7 +60,11 @@ def apply_standardizer(
             return series.apply(lambda x: clean_string(x, remove_special_chars=False))
         case StringStandardizers.LABEL_ENCODING:
             le = LabelEncoder()
-            return pd.Series(le.fit_transform(series.astype(str)), index=series.index)
+            encoded_series = pd.Series(
+                le.fit_transform(series.astype(str)), index=series.index
+            )
+            mapping = dict(zip(le.classes_, range(len(le.classes_))))
+            return encoded_series, mapping
         case StringStandardizers.LABEL_BINARIZER:
             lb = LabelBinarizer()
             encoded = lb.fit_transform(series.astype(str))
@@ -100,11 +104,18 @@ def standardize_strings(
 def standardize_strings(
     dataframe: pd.DataFrame,
     standardizer: StringStandardizers | Dict[str, StringStandardizers],
-) -> pd.DataFrame:
+) -> Tuple[pd.DataFrame, Dict[str, int]]:
+    mappings = {}
+
     if isinstance(standardizer, StringStandardizers):
         string_columns = dataframe.select_dtypes(include=["object"]).columns
         for col in string_columns:
-            dataframe[col] = apply_standardizer(dataframe[col], standardizer)
+            result = apply_standardizer(dataframe[col], standardizer)
+            if isinstance(result, tuple):
+                dataframe[col], mapping = result
+                mappings[col] = mapping
+            else:
+                dataframe[col] = result
     elif isinstance(standardizer, dict):
         for col, std in standardizer.items():
             if col not in dataframe.columns:
@@ -113,10 +124,15 @@ def standardize_strings(
                 raise ValueError(
                     f"Column '{col}' is not string and cannot be standardized."
                 )
-            dataframe[col] = apply_standardizer(dataframe[col], std)
+            result = apply_standardizer(dataframe[col], std)
+            if isinstance(result, tuple):
+                dataframe[col], mapping = result
+                mappings[col] = mapping
+            else:
+                dataframe[col] = result
     else:
         raise ValueError(
             "Invalid input: provide a single StringStandardizer or a dictionary of column-specific standardizers."
         )
 
-    return dataframe
+    return dataframe, mappings

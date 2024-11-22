@@ -42,3 +42,4 @@ unsupported_message = f"""
 
 from .missing_values import MissingValueStrategies
 from .preprocessor import Preprocessor
+from .standardization import StringStandardizers

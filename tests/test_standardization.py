@@ -33,3 +33,26 @@ def test_string_std_clean():
         "age": [25, 30, 35],
         "city": ["new_york", "los_angeles", "chicago"],
     }
+
+
+def test_string_std_clean_keep_spc():
+    pp = cqupp.Preprocessor(test_string_data_df)
+    pp.standardize_string_data(cqupp.StringStandardizers.CLEAN_KEEP_SPECIAL_CHARS)
+
+    assert pp.dataframe.to_dict(orient="list") == {
+        "name": ["john_doe34", "jane_doe___!", "4john_smith"],
+        "age": [25, 30, 35],
+        "city": ["new_york", "los_angeles~", "chicago!"],
+    }
+
+
+def test_string_std_label_encode():
+    pp = cqupp.Preprocessor(test_string_data_df)
+    pp.standardize_string_data()
+    pp.standardize_string_data(cqupp.StringStandardizers.LABEL_ENCODING)
+
+    assert pp.dataframe.to_dict(orient="list") == {
+        "name": [2, 1, 0],
+        "age": [25, 30, 35],
+        "city": [2, 1, 0],
+    }
