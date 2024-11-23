@@ -40,6 +40,8 @@ unsupported_message = f"""
     Supported extensions are: {', '.join(supported_readers.keys())}
 """
 
+log_folder_name = "cqu_logs"
+
 from .missing_values import MissingValueStrategies
 from .preprocessor import Preprocessor
 from .standardization import StringStandardizers

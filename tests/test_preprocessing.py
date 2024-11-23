@@ -80,3 +80,9 @@ def test_handle_columns():
         "company",
         "time",
     ]
+
+
+def test_log_generation():
+    pp = cqupp.Preprocessor(test_dataframe)
+    pp.clean_missing()
+    pp.generate_logfile()

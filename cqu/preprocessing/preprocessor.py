@@ -1,10 +1,11 @@
 import os
 import string
+from datetime import datetime
 from typing import Any, Callable, Dict, List, Optional, overload
 
 import pandas as pd
 
-from . import supported_readers, unsupported_message
+from . import log_folder_name, supported_readers, unsupported_message
 from .missing_values import MissingValueStrategies, handle_missing_values
 from .standardization import (
     StringStandardizers,
@@ -20,6 +21,7 @@ class Preprocessor:
     file_extension: Optional[str]
     dataframe: pd.DataFrame
     label_mappings: Dict[str, Dict[str, int]]
+    log_text: str
 
     @overload
     def __init__(self, file_path: str) -> None: ...
@@ -34,6 +36,7 @@ class Preprocessor:
         self.file_extension = None
         self.dataframe = None
         self.label_mappings = {}
+        self.log_text = ""
 
         if keep_duplicates not in {"first", "last", False}:
             raise ValueError(
@@ -44,16 +47,25 @@ class Preprocessor:
             self.file_path = dataset_input
             self.__validate_file_path()
             self.__read_dataset()
+            self.__add_to_logstr(
+                f"Dataset loaded successfully from path: {self.file_path}"
+            )
         elif isinstance(dataset_input, pd.DataFrame):
             self.dataframe = dataset_input
+            self.__add_to_logstr("Dataset loaded successfully from DataFrame")
         else:
             raise ValueError(
                 "Invalid input type. Please provide a file path or a DataFrame."
             )
 
         self.__handle_columns()
+        self.__add_to_logstr(
+            "Column names standardized to all lowercase and underscores seperated strings"
+        )
         self.dataframe = self.dataframe.infer_objects()
+        self.__add_to_logstr("Data types inferred using pd.DataFrame.infer_objects()")
         self.__handle_duplicate_rows(keep_duplicates)
+        self.__add_to_logstr("Duplicate rows deleted from DataFrame")
 
     def get_missing_summary(self) -> Dict[str, int]:
         return self.dataframe.isnull().sum().to_dict()
@@ -102,6 +114,30 @@ class Preprocessor:
     def filter_columns(self, columns: Dict[str, Callable[[Any], bool]]) -> None:
         self.dataframe = filter_columns(self.dataframe, columns)
 
+    def generate_logfile(self) -> None:
+        log_summary = f"""
+[DATASET SHAPE]: {self.dataframe.shape}\n
+[COLUMNS]: {', '.join(self.dataframe.columns)}\n
+[MISSING VALUES]: {self.get_missing_summary()}\n
+[LABEL MAPPINGS]: {self.label_mappings}\n
+        """
+
+        current_time = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
+        current_time_title = datetime.now().strftime("%Y-%m-%d At %H:%M:%S")
+
+        if not os.path.exists(log_folder_name):
+            os.makedirs(log_folder_name)
+
+        file_name = f"{current_time}_PREPROCESSOR_LOGS.txt"
+        file_path = os.path.join(log_folder_name, file_name)
+
+        final_log_text = f"[ CQU PREPROCESSOR LOGS ] [ Generated On {current_time_title} ]\n\n{log_summary.strip()}\n\n{self.log_text}"
+
+        with open(file_path, "w") as file:
+            file.write(final_log_text)
+
+        print(f"Log file generated at: {file_path}")
+
     def write_to(self, file_path: str) -> None:
         _, extension = os.path.splitext(file_path)
         extension = extension.lower()
@@ -146,3 +182,7 @@ class Preprocessor:
         self.dataframe = self.dataframe.drop_duplicates(keep=keep).reset_index(
             drop=True
         )
+
+    def __add_to_logstr(self, text: str) -> None:
+        time_str = datetime.now().strftime("[%H:%M:%S]")
+        self.log_text += f"{time_str} {text}\n"
