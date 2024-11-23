@@ -16,8 +16,7 @@ def smote_on_column(
     non_numeric_columns = X.select_dtypes(exclude=["number"]).columns
     if not non_numeric_columns.empty:
         raise ValueError(
-            f"The following columns are non-numeric: {list(non_numeric_columns)}. "
-            "SMOTE requires all feature columns to be numeric."
+            f"The following columns are non-numeric: {list(non_numeric_columns)}. SMOTE requires all feature columns to be numeric."
         )
 
     smote = SMOTE(random_state=random_state, k_neighbors=k_neighbors)
