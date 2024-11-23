@@ -154,8 +154,12 @@ class Preprocessor:
                 f"[FILTERING] Rows in column '{column}' filtered using custom function. {rows_filtered_out} rows filtered out."
             )
 
-    def smote_on_column(self, target_column: str, random_state: int = None) -> None:
-        self.dataframe = smote_on_column(self.dataframe, target_column, random_state)
+    def smote_on_column(
+        self, target_column: str, random_state: int = None, k_neighbors: int = 5
+    ) -> None:
+        self.dataframe = smote_on_column(
+            self.dataframe, target_column, random_state, k_neighbors
+        )
 
         self.__add_to_logstr(
             f"[SMOTE] Oversampling performed with column '{target_column}' as class using SMOTE"

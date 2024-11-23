@@ -5,7 +5,7 @@ from imblearn.over_sampling import SMOTE
 
 
 def smote_on_column(
-    dataframe: pd.DataFrame, target_column: str, random_state: int = None
+    dataframe: pd.DataFrame, target_column: str, random_state: int, k_neighbors: int
 ) -> pd.DataFrame:
     if target_column not in dataframe.columns:
         raise ValueError(f"Target column '{target_column}' not found in DataFrame.")
@@ -20,7 +20,7 @@ def smote_on_column(
             "SMOTE requires all feature columns to be numeric."
         )
 
-    smote = SMOTE(random_state=random_state)
+    smote = SMOTE(random_state=random_state, k_neighbors=k_neighbors)
     X_resampled, y_resampled = smote.fit_resample(X, y)
 
     resampled_df = pd.DataFrame(X_resampled, columns=X.columns)
