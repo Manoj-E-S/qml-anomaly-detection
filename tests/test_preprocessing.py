@@ -22,6 +22,16 @@ def test_invalid_path():
         pp = cqupp.Preprocessor(invalid_path)
 
 
+def test_invalid_keep_value():
+    invalid_keep_value = "middle"
+
+    with pytest.raises(
+        ValueError,
+        match="Invalid value for keep_duplicates. Please provide 'first', 'last', or False.",
+    ):
+        pp = cqupp.Preprocessor("datasets/ccfraud/creditcard.csv", invalid_keep_value)
+
+
 def test_unsupported_filetype():
     invalid_filetype = "datasets/eda.ipynb"
 
