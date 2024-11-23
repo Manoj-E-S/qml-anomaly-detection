@@ -262,9 +262,9 @@ test_data_numeric_std = {
 test_dataframe = pd.DataFrame(test_data)
 
 test_string_data = {
-    "name": ["John Doe34", "Jane_Doe   !", "4John Smith"],
-    "age": [25, 30, 35],
-    "city": ["  New York ", "Los Angeles~", "Chicago!"],
+    "name": ["John Doe34", "Jane_Doe   !", "4John Smith", " John Doe34"],
+    "age": [25, 30, 35, 25],
+    "city": ["  New York ", "Los Angeles~", "Chicago!", "New York"],
 }
 
 test_string_data_df = pd.DataFrame(test_string_data)

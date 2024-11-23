@@ -29,9 +29,9 @@ def test_string_std_clean():
     pp.standardize_string_data()
 
     assert pp.dataframe.to_dict(orient="list") == {
-        "name": ["john_doe34", "jane_doe", "4john_smith"],
-        "age": [25, 30, 35],
-        "city": ["new_york", "los_angeles", "chicago"],
+        "name": ["john_doe34", "jane_doe", "4john_smith", "john_doe34"],
+        "age": [25, 30, 35, 25],
+        "city": ["new_york", "los_angeles", "chicago", "new_york"],
     }
 
 
@@ -40,9 +40,9 @@ def test_string_std_clean_keep_spc():
     pp.standardize_string_data(cqupp.StringStandardizers.CLEAN_KEEP_SPECIAL_CHARS)
 
     assert pp.dataframe.to_dict(orient="list") == {
-        "name": ["john_doe34", "jane_doe___!", "4john_smith"],
-        "age": [25, 30, 35],
-        "city": ["new_york", "los_angeles~", "chicago!"],
+        "name": ["john_doe34", "jane_doe___!", "4john_smith", "john_doe34"],
+        "age": [25, 30, 35, 25],
+        "city": ["new_york", "los_angeles~", "chicago!", "new_york"],
     }
 
 
@@ -52,12 +52,26 @@ def test_string_std_label_encode():
     pp.standardize_string_data(cqupp.StringStandardizers.LABEL_ENCODING)
 
     assert pp.dataframe.to_dict(orient="list") == {
-        "name": [2, 1, 0],
-        "age": [25, 30, 35],
-        "city": [2, 1, 0],
+        "name": [2, 1, 0, 2],
+        "age": [25, 30, 35, 25],
+        "city": [2, 1, 0, 2],
     }
 
     assert pp.label_mappings == {
         "name": {"4john_smith": 0, "jane_doe": 1, "john_doe34": 2},
         "city": {"chicago": 0, "los_angeles": 1, "new_york": 2},
+    }
+
+
+def test_string_std_onehotencoding():
+    pp = cqupp.Preprocessor(test_string_data_df)
+    pp.standardize_string_data()
+    pp.standardize_string_data({"name": cqupp.StringStandardizers.ONE_HOT_ENCODING})
+
+    assert pp.dataframe.to_dict(orient="list") == {
+        "age": [25, 30, 35, 25],
+        "city": ["new_york", "los_angeles", "chicago", "new_york"],
+        "4john_smith": [0.0, 0.0, 1.0, 0.0],
+        "jane_doe": [0.0, 1.0, 0.0, 0.0],
+        "john_doe34": [1.0, 0.0, 0.0, 1.0],
     }

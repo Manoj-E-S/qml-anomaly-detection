@@ -76,9 +76,9 @@ def apply_standardizer(
                 )
                 return encoded_df
         case StringStandardizers.ONE_HOT_ENCODING:
-            ohe = OneHotEncoder(sparse=False, handle_unknown="ignore")
+            ohe = OneHotEncoder(sparse_output=False, handle_unknown="ignore")
             ohe_df = pd.DataFrame(
-                ohe.fit_transform(series.astype(str.to_frame())),
+                ohe.fit_transform(series.astype(str).to_frame()),
                 index=series.index,
                 columns=ohe.categories_[0],
             )
@@ -107,15 +107,29 @@ def standardize_strings(
 ) -> Tuple[pd.DataFrame, Dict[str, int]]:
     mappings = {}
 
+    def standardizer_side_effects(
+        result: pd.Series | pd.DataFrame | Tuple[pd.Series, Dict[str, int]],
+        colname: str,
+        stdizer: StringStandardizers,
+    ) -> None:
+        nonlocal dataframe, mappings
+
+        match stdizer:
+            case StringStandardizers.LABEL_ENCODING:
+                dataframe[colname] = result[0]
+                mappings[colname] = result[1]
+            case StringStandardizers.ONE_HOT_ENCODING:
+                dataframe = pd.concat([dataframe, result], axis=1)
+                dataframe = dataframe.drop(colname, axis=1)
+            case _:
+                dataframe[colname] = result
+        pass
+
     if isinstance(standardizer, StringStandardizers):
         string_columns = dataframe.select_dtypes(include=["object"]).columns
         for col in string_columns:
             result = apply_standardizer(dataframe[col], standardizer)
-            if isinstance(result, tuple):
-                dataframe[col], mapping = result
-                mappings[col] = mapping
-            else:
-                dataframe[col] = result
+            standardizer_side_effects(result, col, standardizer)
     elif isinstance(standardizer, dict):
         for col, std in standardizer.items():
             if col not in dataframe.columns:
@@ -125,11 +139,7 @@ def standardize_strings(
                     f"Column '{col}' is not string and cannot be standardized."
                 )
             result = apply_standardizer(dataframe[col], std)
-            if isinstance(result, tuple):
-                dataframe[col], mapping = result
-                mappings[col] = mapping
-            else:
-                dataframe[col] = result
+            standardizer_side_effects(result, col, std)
     else:
         raise ValueError(
             "Invalid input: provide a single StringStandardizer or a dictionary of column-specific standardizers."
