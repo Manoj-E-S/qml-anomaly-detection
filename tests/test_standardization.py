@@ -79,6 +79,25 @@ def test_string_std_label_binarizer():
         "working": [0, 0, 1, 0],
     }
 
+    assert pp.label_mappings == {
+        "working": {"no": 0, "yes": 1},
+    }
+
+
+def test_string_std_label_binarizer_multiclass():
+    pp = cqupp.Preprocessor(test_string_data_df)
+    pp.standardize_string_data()
+    pp.standardize_string_data({"name": cqupp.StringStandardizers.LABEL_BINARIZER})
+
+    assert pp.dataframe.to_dict(orient="list") == {
+        "age": [25, 30, 35, 25],
+        "city": ["new_york", "los_angeles", "chicago", "new_york"],
+        "working": ["no", "no", "yes", "no"],
+        "4john_smith": [0.0, 0.0, 1.0, 0.0],
+        "jane_doe": [0.0, 1.0, 0.0, 0.0],
+        "john_doe34": [1.0, 0.0, 0.0, 1.0],
+    }
+
 
 def test_string_std_onehotencoding():
     pp = cqupp.Preprocessor(test_string_data_df)

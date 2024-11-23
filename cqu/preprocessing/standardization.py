@@ -69,7 +69,8 @@ def apply_standardizer(
             lb = LabelBinarizer()
             encoded = lb.fit_transform(series.astype(str))
             if encoded.shape[1] == 1:
-                return pd.Series(encoded.flatten(), index=series.index)
+                mapping = {cls: i for i, cls in enumerate(lb.classes_)}
+                return pd.Series(encoded.flatten(), index=series.index), mapping
             else:
                 encoded_df = pd.DataFrame(
                     encoded, index=series.index, columns=lb.classes_
@@ -119,8 +120,9 @@ def standardize_strings(
                 dataframe[colname] = result[0]
                 mappings[colname] = result[1]
             case StringStandardizers.LABEL_BINARIZER:
-                if isinstance(result, pd.Series):
-                    dataframe[colname] = result
+                if isinstance(result, tuple):
+                    dataframe[colname] = result[0]
+                    mappings[colname] = result[1]
                 else:
                     dataframe = pd.concat([dataframe, result], axis=1)
                     dataframe = dataframe.drop(colname, axis=1)
