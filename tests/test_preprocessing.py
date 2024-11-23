@@ -82,7 +82,14 @@ def test_handle_columns():
     ]
 
 
+# MANUAL TEST, CHECK THE cqu_logs FOLDER TO CHECK THE GENERATED LOG FILE AND CHECK FOR ANY ERRORS
 def test_log_generation():
     pp = cqupp.Preprocessor(test_dataframe)
-    pp.clean_missing()
+    pp.clean_missing(cqupp.MissingValueStrategies.DROP_ROWS)
+    pp.standardize_numeric_data(["salary"])
+    pp.standardize_string_data()
+    pp.standardize_string_data({"company": cqupp.StringStandardizers.ONE_HOT_ENCODING})
+    pp.filter_columns({"age": lambda x: x > 18})
+
+    pp.write_to("cqu_logs/test_log_dataset.csv")
     pp.generate_logfile()

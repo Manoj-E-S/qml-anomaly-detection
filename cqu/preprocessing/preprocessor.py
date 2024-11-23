@@ -47,25 +47,20 @@ class Preprocessor:
             self.file_path = dataset_input
             self.__validate_file_path()
             self.__read_dataset()
-            self.__add_to_logstr(
-                f"Dataset loaded successfully from path: {self.file_path}"
-            )
         elif isinstance(dataset_input, pd.DataFrame):
             self.dataframe = dataset_input
-            self.__add_to_logstr("Dataset loaded successfully from DataFrame")
+            self.__add_to_logstr("[INIT] Dataset loaded successfully from DataFrame")
         else:
             raise ValueError(
                 "Invalid input type. Please provide a file path or a DataFrame."
             )
 
         self.__handle_columns()
-        self.__add_to_logstr(
-            "Column names standardized to all lowercase and underscores seperated strings"
-        )
         self.dataframe = self.dataframe.infer_objects()
-        self.__add_to_logstr("Data types inferred using pd.DataFrame.infer_objects()")
+        self.__add_to_logstr(
+            "[INIT] Data types inferred using pd.DataFrame.infer_objects()"
+        )
         self.__handle_duplicate_rows(keep_duplicates)
-        self.__add_to_logstr("Duplicate rows deleted from DataFrame")
 
     def get_missing_summary(self) -> Dict[str, int]:
         return self.dataframe.isnull().sum().to_dict()
@@ -86,11 +81,36 @@ class Preprocessor:
     ) -> None:
         self.dataframe = handle_missing_values(self.dataframe, strategy_or_strategies)
 
+        if isinstance(strategy_or_strategies, dict):
+            for column, strategy in strategy_or_strategies.items():
+                self.__add_to_logstr(
+                    f"[MISSING] Missing values in column '{column}' handled using strategy: {strategy}"
+                )
+        else:
+            self.__add_to_logstr(
+                f"[MISSING] Missing values in entire DataFrame handled using strategy: {strategy_or_strategies}"
+            )
+
     def convert_dtypes(self, column_types: Dict[str, Any]) -> None:
         self.dataframe = convert_types(self.dataframe, column_types)
 
+        for column, dtype in column_types.items():
+            self.__add_to_logstr(
+                f"[DTYPE CONVERSION] Column '{column}' converted to type: {dtype}"
+            )
+
     def standardize_numeric_data(self, columns: Optional[List[str]] = None) -> None:
         self.dataframe = standardize_numeric(self.dataframe, columns)
+
+        if columns:
+            for column in columns:
+                self.__add_to_logstr(
+                    f"[STANDARDIZATION_NUMERIC] Column '{column}' standardized using Z-score normalization"
+                )
+        else:
+            self.__add_to_logstr(
+                "[STANDARDIZATION_NUMERIC] All numeric columns standardized using Z-score normalization"
+            )
 
     @overload
     def standardize_string_data(
@@ -111,8 +131,27 @@ class Preprocessor:
         self.dataframe, mappings = standardize_strings(self.dataframe, standardizer)
         self.label_mappings.update(mappings)
 
+        if isinstance(standardizer, dict):
+            for column, strategy in standardizer.items():
+                self.__add_to_logstr(
+                    f"[STANDARDIZATION_STRING] Column '{column}' standardized using strategy: {strategy}"
+                )
+        else:
+            self.__add_to_logstr(
+                f"[STANDARDIZATION_STRING] All string columns standardized using strategy: {standardizer}"
+            )
+
     def filter_columns(self, columns: Dict[str, Callable[[Any], bool]]) -> None:
+        row_count = self.dataframe.shape[0]
+
         self.dataframe = filter_columns(self.dataframe, columns)
+
+        rows_filtered_out = row_count - self.dataframe.shape[0]
+
+        for column, filter_func in columns.items():
+            self.__add_to_logstr(
+                f"[FILTERING] Rows in column '{column}' filtered using custom function. {rows_filtered_out} rows filtered out."
+            )
 
     def generate_logfile(self) -> None:
         log_summary = f"""
@@ -149,6 +188,8 @@ class Preprocessor:
         method = getattr(self.dataframe, method_name)
         method(file_path)
 
+        self.__add_to_logstr(f"[FILE_WRITE] DataFrame written to file: {file_path}")
+
     def __validate_file_path(self) -> None:
         if not os.path.exists(self.file_path):
             raise FileNotFoundError(f"File not found: {self.file_path}")
@@ -169,6 +210,10 @@ class Preprocessor:
         else:
             self.dataframe = data
 
+        self.__add_to_logstr(
+            f"[INIT] Dataset loaded successfully from path: {self.file_path}"
+        )
+
     def __handle_columns(self) -> None:
         self.dataframe.columns = (
             self.dataframe.columns.str.strip()
@@ -178,10 +223,16 @@ class Preprocessor:
         )
         self.dataframe = self.dataframe.loc[:, ~self.dataframe.columns.duplicated()]
 
+        self.__add_to_logstr(
+            "[INIT] Column names standardized to all lowercase and underscores seperated strings"
+        )
+
     def __handle_duplicate_rows(self, keep: str) -> None:
         self.dataframe = self.dataframe.drop_duplicates(keep=keep).reset_index(
             drop=True
         )
+
+        self.__add_to_logstr("[INIT] Duplicate rows deleted from DataFrame")
 
     def __add_to_logstr(self, text: str) -> None:
         time_str = datetime.now().strftime("[%H:%M:%S]")

@@ -29,7 +29,7 @@ def standardize_numeric(
                     f"Column '{column}' is not numeric and cannot be standardized numerically."
                 )
 
-            dataframe[column] = scaler.fit_transform(dataframe[column])
+            dataframe[column] = scaler.fit_transform(dataframe[column].to_frame())
 
     return dataframe
 
