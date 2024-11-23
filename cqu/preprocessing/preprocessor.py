@@ -7,6 +7,7 @@ import pandas as pd
 
 from . import log_folder_name, supported_readers, unsupported_message
 from .missing_values import MissingValueStrategies, handle_missing_values
+from .smote import smote_on_column
 from .standardization import (
     StringStandardizers,
     filter_columns,
@@ -152,6 +153,13 @@ class Preprocessor:
             self.__add_to_logstr(
                 f"[FILTERING] Rows in column '{column}' filtered using custom function. {rows_filtered_out} rows filtered out."
             )
+
+    def smote_on_column(self, target_column: str, random_state: int = None) -> None:
+        self.dataframe = smote_on_column(self.dataframe, target_column, random_state)
+
+        self.__add_to_logstr(
+            f"[SMOTE] Oversampling performed with column '{target_column}' as class using SMOTE"
+        )
 
     def generate_logfile(self) -> None:
         log_summary = f"""
