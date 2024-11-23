@@ -1,6 +1,7 @@
+import inspect
 import re
 from enum import Enum
-from typing import Dict, List, Optional, Tuple, overload
+from typing import Any, Callable, Dict, List, Optional, Tuple, overload
 
 import pandas as pd
 from sklearn.preprocessing import (
@@ -154,3 +155,31 @@ def standardize_strings(
         )
 
     return dataframe, mappings
+
+
+def filter_columns(
+    dataframe: pd.DataFrame, columns: Dict[str, Callable[[Any], bool]]
+) -> pd.DataFrame:
+    if not isinstance(columns, dict):
+        raise ValueError(
+            "Invalid input. Please provide a dictionary of column names and filter functions."
+        )
+
+    for column, condition in columns.items():
+        if column not in dataframe.columns:
+            raise ValueError(f"Column '{column}' not found in DataFrame.")
+
+        if not callable(condition):
+            raise ValueError(
+                f"Condition for column '{column}' must be a callable function or lambda."
+            )
+
+        sig = inspect.signature(condition)
+        if len(sig.parameters) != 1:
+            raise ValueError(
+                f"The condition for column '{column}' must take exactly one parameter."
+            )
+
+        dataframe = dataframe[dataframe[column].apply(condition)]
+
+    return dataframe

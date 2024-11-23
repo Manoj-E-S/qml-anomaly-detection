@@ -1,6 +1,6 @@
 import os
 import string
-from typing import Any, Dict, List, Optional, overload
+from typing import Any, Callable, Dict, List, Optional, overload
 
 import pandas as pd
 
@@ -8,6 +8,7 @@ from . import supported_readers, unsupported_message
 from .missing_values import MissingValueStrategies, handle_missing_values
 from .standardization import (
     StringStandardizers,
+    filter_columns,
     standardize_numeric,
     standardize_strings,
 )
@@ -97,6 +98,9 @@ class Preprocessor:
     ) -> None:
         self.dataframe, mappings = standardize_strings(self.dataframe, standardizer)
         self.label_mappings.update(mappings)
+
+    def filter_columns(self, columns: Dict[str, Callable[[Any], bool]]) -> None:
+        self.dataframe = filter_columns(self.dataframe, columns)
 
     def write_to(self, file_path: str) -> None:
         _, extension = os.path.splitext(file_path)

@@ -112,3 +112,42 @@ def test_string_std_onehotencoding():
         "jane_doe": [0.0, 1.0, 0.0, 0.0],
         "john_doe34": [1.0, 0.0, 0.0, 1.0],
     }
+
+
+def test_filter_func():
+    pp = cqupp.Preprocessor(test_string_data_df)
+    pp.standardize_string_data()
+    pp.filter_columns({"age": lambda x: x > 25})
+
+    assert pp.dataframe.to_dict(orient="list") == {
+        "name": ["jane_doe", "4john_smith"],
+        "age": [30, 35],
+        "city": ["los_angeles", "chicago"],
+        "working": ["no", "yes"],
+    }
+
+
+def test_filter_exceptions():
+    pp = cqupp.Preprocessor(test_string_data_df)
+    pp.standardize_string_data()
+
+    with pytest.raises(
+        ValueError,
+        match="Invalid input. Please provide a dictionary of column names and filter functions.",
+    ):
+        pp.filter_columns(lambda x: x > 25)
+
+    with pytest.raises(ValueError, match="Column 'age1' not found in DataFrame."):
+        pp.filter_columns({"age1": lambda x: x > 25})
+
+    with pytest.raises(
+        ValueError,
+        match="Condition for column 'age' must be a callable function or lambda.",
+    ):
+        pp.filter_columns({"age": 23})
+
+    with pytest.raises(
+        ValueError,
+        match="The condition for column 'age' must take exactly one parameter.",
+    ):
+        pp.filter_columns({"age": lambda x, y: x > 25})
