@@ -118,6 +118,12 @@ def standardize_strings(
             case StringStandardizers.LABEL_ENCODING:
                 dataframe[colname] = result[0]
                 mappings[colname] = result[1]
+            case StringStandardizers.LABEL_BINARIZER:
+                if isinstance(result, pd.Series):
+                    dataframe[colname] = result
+                else:
+                    dataframe = pd.concat([dataframe, result], axis=1)
+                    dataframe = dataframe.drop(colname, axis=1)
             case StringStandardizers.ONE_HOT_ENCODING:
                 dataframe = pd.concat([dataframe, result], axis=1)
                 dataframe = dataframe.drop(colname, axis=1)
