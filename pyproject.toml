@@ -20,6 +20,13 @@ jupyterlab = "^4.2.5"
 pre-commit = "^4.0.1"
 pytest = "^8.3.3"
 
+
+[tool.poetry.group.cqu.dependencies]
+imbalanced-learn = "^0.12.4"
+pandas = "^2.2.3"
+numpy = "^2.1.3"
+scikit-learn = "^1.5.2"
+
 [tool.poetry]
 name = "cqu"
 version = "0.1.0"
@@ -38,7 +45,7 @@ seaborn = "^0.13.2"
 pandas = "^2.2.3"
 dask = {extras = ["complete"], version = "^2024.9.1"}
 imblearn = "^0.0"
-qiskit-aer-gpu = "^0.15.1"
+# qiskit-aer-gpu = "^0.15.1"
 gdown = "^5.2.0"
 openpyxl = "^3.1.5"
 

@@ -22,6 +22,16 @@ def test_invalid_path():
         pp = cqupp.Preprocessor(invalid_path)
 
 
+def test_invalid_keep_value():
+    invalid_keep_value = "middle"
+
+    with pytest.raises(
+        ValueError,
+        match="Invalid value for keep_duplicates. Please provide 'first', 'last', or False.",
+    ):
+        pp = cqupp.Preprocessor("datasets/ccfraud/creditcard.csv", invalid_keep_value)
+
+
 def test_unsupported_filetype():
     invalid_filetype = "datasets/eda.ipynb"
 
@@ -80,3 +90,16 @@ def test_handle_columns():
         "company",
         "time",
     ]
+
+
+# MANUAL TEST, CHECK THE cqu_logs FOLDER TO CHECK THE GENERATED LOG FILE AND CHECK FOR ANY ERRORS
+def test_log_generation():
+    pp = cqupp.Preprocessor(test_dataframe)
+    pp.clean_missing(cqupp.MissingValueStrategies.DROP_ROWS)
+    pp.standardize_numeric_data(["salary"])
+    pp.standardize_string_data()
+    pp.standardize_string_data({"company": cqupp.StringStandardizers.ONE_HOT_ENCODING})
+    pp.filter_columns({"age": lambda x: x > 18})
+
+    pp.write_to("cqu_logs/test_log_dataset.csv")
+    pp.generate_logfile()
