@@ -5,6 +5,6 @@ by the other modules to log operations and errors. To log your own operations,
 use the logging module from the Python standard library instead.
 """
 
-log_folder_name = "cqu_logs"
+LOG_FOLDER_NAME = "cqu_logs"
 
-from .__logger import _Logger
+from .__logger import __Logger

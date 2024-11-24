@@ -1,33 +1,45 @@
 import os
 import random
 from datetime import datetime
-from enum import Enum
 
-from . import log_folder_name
+from . import LOG_FOLDER_NAME
 
 
 class __Logger:
-    log_str = ""
+    log_buffer: str
+    module_name: str
 
-    def __init__(self):
-        pass
+    def __init__(self, module_name: str):
+        self.log_buffer = ""
+        self.module_name = module_name
 
-    def log(self, code: str, name: str, message: str) -> None:
+    def log(self, name: str, message: str) -> None:
         time_str = self.__get_time_string()
-        self.log_str += f"\n[{time_str}] [{code}] [{name}] - {message}"
+        self.log_buffer += f"\n[{time_str}] [{name}] - {message}"
 
-    def dump(self) -> None:
-        log_file = self.__get_log_file_path()
+    def dump(self, header: str) -> None:
+        if not os.path.exists(LOG_FOLDER_NAME):
+            os.makedirs(LOG_FOLDER_NAME)
 
-        with open(log_file, "w") as log_file:
-            log_file.write(self.log_str)
+        current_time_title = datetime.now().strftime("%Y-%m-%d At %H:%M:%S")
+        log_title = (
+            f"[ CQU {self.module_name} LOGS ] [ Generated On {current_time_title} ]"
+        )
+
+        log_output = f"{log_title}\n{header}\n{self.log_buffer}"
+        log_file_path = self.__get_log_file_path()
+
+        with open(log_file_path, "w") as log_file:
+            log_file.write(log_output)
+
+        print(f"Log file generated at: {log_file_path}")
 
     def __get_log_file_path(self) -> str:
         current_time = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
         random_int_str = str(random.randint(10000, 99999))
-        file_name = f"CQU_LOGS_{current_time}_{random_int_str}.txt"
+        file_name = f"{self.module_name}_{current_time}_{random_int_str}.txt"
 
-        return os.path.join(log_folder_name, file_name)
+        return os.path.join(LOG_FOLDER_NAME, file_name)
 
     def __get_time_string(self) -> str:
         return datetime.now().strftime("%H:%M:%S")
