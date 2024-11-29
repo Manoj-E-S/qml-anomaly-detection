@@ -1,0 +1,6 @@
+Logistic Regression
+Random Forest
+Gradient Boosting Models
+Neural Networks
+K-Nearest Neighbors (KNN)
+Naive Bayes
