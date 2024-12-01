@@ -76,9 +76,9 @@ def get_feature_importance(data, target_column, top_n=10):
 
     return importance_results
 
+if __name__ == '__main__':
+    # Load your dataset
+    data = pd.read_csv("../datasets/ccfraud/creditcard.csv")
+    target_column = "Class"  # Replace with your target column name
 
-# Load your dataset
-data = pd.read_csv("../datasets/ccfraud/creditcard.csv")
-target_column = "Class"  # Replace with your target column name
-
-print(get_feature_importance(data, target_column, top_n=5))
+    print(get_feature_importance(data, target_column, top_n=5))
