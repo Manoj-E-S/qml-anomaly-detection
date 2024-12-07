@@ -26,7 +26,8 @@ def logistic_regression_with_analysis(data, target_column, important_features, t
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
 
     # Compute class weights
-    class_weights = {0: len(y) / (2 * (y == 0).sum()), 1: len(y) / (2 * (y == 1).sum())} #change class weights formulae
+    #class_weights = {0: len(y) / (2 * (y == 0).sum()), 1: len(y) / (2 * (y == 1).sum())} #change class weights formulae
+    class_weights = {0: 20, 1: 35}
 
     # Fit Logistic Regression model
     model = LogisticRegression(max_iter=1000, random_state=42, class_weight=class_weights)
@@ -40,7 +41,7 @@ def logistic_regression_with_analysis(data, target_column, important_features, t
         fpr, tpr, thresholds = roc_curve(y_test, y_proba)
         gmeans = (tpr * (1 - fpr)) ** 0.5
         optimal_idx = gmeans.argmax()
-        threshold = thresholds[optimal_idx]
+        threshold = 1 - thresholds[optimal_idx]
 
     # Apply the threshold to classify
     y_pred = (y_proba >= threshold).astype(int)
