@@ -7,14 +7,14 @@ if __name__ == '__main__':
     data = pd.read_csv("datasets\ccfraud\creditcard.csv")
     target_column = "Class"  # Replace with your target column name
 
-    # x = get_feature_importance(data, target_column, top_n=5)
-    # print(x)
-    # print(x['logistic_regression']['Feature'].tolist())
-    # print(x['random_forest']['Feature'].tolist())
+    x = get_feature_importance(data, target_column, top_n=5)
+    for model, data in x.items():
+        features = data['Feature']
+        print(f"{model}\n = {features}")
 
-    # logistic_regression_with_analysis(data, target_column, x)
-    # random_forest_with_analysis(data, target_column, 1)
-    # gradient_boosting_with_analysis(data, target_column, 1)
-    # neural_network_with_analysis(data, target_column, 1)
-    # knn_model_with_analysis(data, target_column, 1, 5)
-    naive_bayes_model_with_analysis(data, target_column, 1)
+    logistic_regression_with_analysis(data, target_column, x)
+    random_forest_with_analysis(data, target_column, x)
+    gradient_boosting_with_analysis(data, target_column, x)
+    neural_network_with_analysis(data, target_column, x)
+    knn_model_with_analysis(data, target_column, x, 5)
+    naive_bayes_model_with_analysis(data, target_column, x)

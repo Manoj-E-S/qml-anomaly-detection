@@ -54,8 +54,9 @@ def logistic_regression_with_analysis(data, target_column, important_features, t
     - dict: A dictionary containing precision, recall, F1-score, ROC AUC score, and the classification report.
     """
     # Use only the important features
-    # feature_names = important_features['logistic_regression']['Feature'].tolist()
-    feature_names = ['Amount', 'V3', 'V14', 'V17', 'V9']
+    feature_names = important_features['logistic_regression']['Feature'].tolist()
+    print(important_features['logistic_regression']['Feature'].tolist())
+    # feature_names = ['Amount', 'V3', 'V14', 'V17', 'V9']
     X = data[feature_names]
     y = data[target_column]
 
@@ -88,8 +89,11 @@ def logistic_regression_with_analysis(data, target_column, important_features, t
     roc_auc = roc_auc_score(y_test, y_proba)
 
     # Print and return results
+    print("\n\nLogistic Regression")
     print("Classification Report:\n", classification_report(y_test, y_pred))
     print("ROC AUC Score:", roc_auc)
+    print('threshold:', threshold)
+    print('class_weights:', class_weights)
 
     results = {
         'classification_report': report,
@@ -122,8 +126,8 @@ def random_forest_with_analysis(data, target_column, important_features, thresho
     """
     # Use only the important features
     #feature_names = important_features['Feature'].tolist()
-    # feature_names = important_features['logistic_regression']['Feature'].tolist()
-    feature_names = ['V17', 'V12', 'V14', 'V10', 'V16']
+    feature_names = important_features['random_forest']['Feature'].tolist()
+    # feature_names = ['V17', 'V12', 'V14', 'V10', 'V16']
     X = data[feature_names]
     y = data[target_column]
 
@@ -140,20 +144,21 @@ def random_forest_with_analysis(data, target_column, important_features, thresho
 
     # Predict probabilities for the positive class
     y_proba = model.predict_proba(X_test)[:, 1]
-
+    threshold, report = optimize_threshold(y_proba, y_test, 0.01)
 
     # Apply the threshold to classify
-    y_pred = (y_proba >= 0.54).astype(int)
+    y_pred = (y_proba >= threshold).astype(int)
 
     # Generate evaluation metrics
     report = classification_report(y_test, y_pred, output_dict=True)
     roc_auc = roc_auc_score(y_test, y_proba)
 
     # Print and return results
+    print("\n\nRandom Forest")
     print("Classification Report:\n", classification_report(y_test, y_pred))
     print("ROC AUC Score:", roc_auc)
-    print('threshold:', threshold)
-    print('class_weights:', class_weights)
+    print('Threshold:', threshold)
+    print('Class weights:', class_weights)
 
     results = {
         'classification_report': report,
@@ -184,8 +189,8 @@ def gradient_boosting_with_analysis(data, target_column, important_features, thr
     - dict: A dictionary containing precision, recall, F1-score, ROC AUC score, and the classification report.
     """
     # Use only the important features
-    # feature_names = important_features['logistic_regression']['Feature'].tolist()
-    feature_names = ['V14', 'V27', 'V10', 'V17', 'V11']
+    feature_names = important_features['gradient_boosting']['Feature'].tolist()
+    # feature_names = ['V14', 'V27', 'V10', 'V17', 'V11']
     X = data[feature_names]
     y = data[target_column]
 
@@ -216,6 +221,7 @@ def gradient_boosting_with_analysis(data, target_column, important_features, thr
     roc_auc = roc_auc_score(y_test, y_proba)
 
     # Print and return results
+    print("\n\nGradient Boosting")
     print("Classification Report:\n", classification_report(y_test, y_pred))
     print("ROC AUC Score:", roc_auc)
     print('threshold:', threshold)
@@ -254,8 +260,8 @@ def neural_network_with_analysis(data, target_column, important_features, thresh
     - dict: A dictionary containing precision, recall, F1-score, ROC AUC score, and the classification report.
     """
     # Use only the important features
-    # feature_names = important_features['Feature'].tolist()
-    feature_names = ['V17', 'V14', 'V12', 'V16', 'V10']
+    feature_names = important_features['neural_network']['Feature'].tolist()
+    # feature_names = ['V17', 'V14', 'V12', 'V16', 'V10']
     X = data[feature_names].values
     y = data[target_column].values
 
@@ -299,10 +305,10 @@ def neural_network_with_analysis(data, target_column, important_features, thresh
     roc_auc = roc_auc_score(y_test, y_proba)
 
     # Print and return results
+    print("\n\nNeural Network")
     print("Classification Report:\n", classification_report(y_test, y_pred))
     print("ROC AUC Score:", roc_auc)
     print('threshold:', threshold)
-    # print('class_weights:', class_weights)
     print('scale_pos_weight', class_weights)
 
     results = {
@@ -337,8 +343,8 @@ def knn_model_with_analysis(data, target_column, important_features, n_neighbors
     - dict: A dictionary containing precision, recall, F1-score, ROC AUC score, and the classification report.
     """
     # Use only the important features
-    # feature_names = important_features['Feature'].tolist()
-    feature_names = ['V17', 'V14', 'V12', 'V10', 'V16']
+    feature_names = important_features['knn']['Feature'].tolist()
+    # feature_names = ['V17', 'V14', 'V12', 'V10', 'V16']
     X = data[feature_names].values
     y = data[target_column].values
 
@@ -361,6 +367,7 @@ def knn_model_with_analysis(data, target_column, important_features, n_neighbors
     roc_auc = roc_auc_score(y_test, y_proba)
 
     # Print and return results
+    print("\n\nKnn Model")
     print("Classification Report:\n", classification_report(y_test, y_pred))
     print("ROC AUC Score:", roc_auc)
     print('threshold:', threshold)
@@ -395,8 +402,8 @@ def naive_bayes_model_with_analysis(data, target_column, important_features, thr
     - dict: A dictionary containing precision, recall, F1-score, ROC AUC score, and the classification report.
     """
     # Use only the important features
-    # feature_names = important_features['Feature'].tolist()
-    feature_names = ['Time', 'Amount', 'V14', 'V3', 'V17']
+    feature_names = important_features['naive_bayes']['Feature'].tolist()
+    # feature_names = ['Time', 'Amount', 'V14', 'V3', 'V17']
     X = data[feature_names].values
     y = data[target_column].values
 
@@ -419,6 +426,7 @@ def naive_bayes_model_with_analysis(data, target_column, important_features, thr
     roc_auc = roc_auc_score(y_test, y_proba)
 
     # Print and return results
+    print("\n\nNaive Bayes Model")
     print("Classification Report:\n", classification_report(y_test, y_pred))
     print("ROC AUC Score:", roc_auc)
     print('threshold:', threshold)
