@@ -1,0 +1,8 @@
+Logistic Regression
+Random Forest
+Gradient Boosting Modes
+Neural Networks
+K-Nearest Neighbors (KNN)
+Naive Bayes
+
+pip install xgboost
