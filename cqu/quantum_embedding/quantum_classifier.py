@@ -3,6 +3,7 @@ from typing import List, overload
 
 import numpy as np
 import pandas as pd
+from qiskit import transpile
 from qiskit.circuit import QuantumCircuit
 from qiskit.circuit.library import TwoLocal, ZZFeatureMap
 from qiskit_aer import AerSimulator
@@ -25,6 +26,7 @@ class QuantumClassifier:
     backend: Backend | None
     batch: Batch | None
 
+    num_features: int
     feature_map: ZZFeatureMap | None
     var_form: TwoLocal | None
     full_circuit: QuantumCircuit | None
@@ -61,6 +63,7 @@ class QuantumClassifier:
         self.backend = self.service.least_busy() if self.use_backend else AerSimulator()
         self.batch = Batch(backend=self.backend)
 
+        self.num_features = 0
         self.feature_map = None
         self.var_form = None
         self.full_circuit = None
@@ -68,8 +71,6 @@ class QuantumClassifier:
 
         self.test_size = test_size
         self.random_state = random_state
-
-        self.__initialize_circuit()
 
     @overload
     def train(self, X: pd.DataFrame, y: pd.DataFrame) -> None: ...
@@ -93,6 +94,9 @@ class QuantumClassifier:
         X_train, X_test, y_train, y_test = train_test_split(
             X, y, test_size=self.test_size, random_state=self.random_state
         )
+
+        self.num_features = X_train.shape[1]
+        self.__initialize_circuit()
 
         def objective_function(variational):
             nonlocal X_train, y_train
@@ -128,10 +132,67 @@ class QuantumClassifier:
         print("Confusion Matrix:\n", confusion_matrix(y_test, predictions))
         print("###################################")
 
+    def predict(self, data: pd.DataFrame) -> List[int]:
+        return [
+            0 if p[0] >= p[1] else 1
+            for p in self.__classification_probability(data.values, self.opt_var)
+        ]
+
+    def __circuit_instance(
+        self, data: np.ndarray, variational: np.ndarray
+    ) -> QuantumCircuit:
+        parameters = {}
+        for i, p in enumerate(self.feature_map.ordered_parameters):
+            parameters[p] = data[i]
+        for i, p in enumerate(self.var_form.ordered_parameters):
+            parameters[p] = variational[i]
+        return self.full_circuit.assign_parameters(parameters)
+
+    def __parity(self, bitstring: str) -> int:
+        hamming_weight = sum(int(k) for k in list(bitstring))
+        return (hamming_weight + 1) % 2
+
+    def __label_probability(self, results: dict) -> dict:
+        shots = sum(results.values())
+        probabilities = {0: 0, 1: 0}
+        for bitstring, counts in results.items():
+            label = self.__parity(bitstring)
+            probabilities[label] += counts / shots
+        return probabilities
+
+    def __classification_probability(
+        self, data: np.ndarray, variational: np.ndarray
+    ) -> List[dict]:
+        circuits = [
+            transpile(self.__circuit_instance(d, variational), backend=self.backend)
+            for d in data
+        ]
+        sampler = SamplerV2(mode=self.batch)
+        results = sampler.run(circuits).result()
+        classification = [
+            self.__label_probability(results[i].data.meas.get_counts())
+            for i, c in enumerate(circuits)
+        ]
+        return classification
+
+    def __cross_entropy_loss(self, classification: dict, expected: int) -> float:
+        p = classification.get(expected)
+        return -np.log(p + 1e-10)
+
+    def __cost_function(
+        self, X: np.ndarray, y: np.ndarray, variational: np.ndarray
+    ) -> float:
+        classifications = self.__classification_probability(X, variational)
+        cost = 0
+        for i, classification in enumerate(classifications):
+            cost += self.__cross_entropy_loss(classification, y[i])
+        cost /= len(y)
+        return cost
+
     def __initialize_circuit(self) -> None:
-        self.feature_map = ZZFeatureMap(feature_dimension=5, reps=2)
+        self.feature_map = ZZFeatureMap(feature_dimension=self.num_features, reps=2)
         self.feature_map.barrier()
-        self.var_form = TwoLocal(5, ["ry", "rz"], "cz", reps=3)
+        self.var_form = TwoLocal(self.num_features, ["ry", "rz"], "cz", reps=2)
 
         self.full_circuit = self.feature_map.compose(self.var_form)
         self.full_circuit.measure_all()
