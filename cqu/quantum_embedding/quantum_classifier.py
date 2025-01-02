@@ -45,7 +45,7 @@ class QuantumClassifier:
 
     @overload
     def __init__(
-        self, test_size: float, random_state: int, backend_provider: str
+        self, test_size: float, random_state: int, backend_token: str
     ) -> None: ...
 
     def __init__(
