@@ -1,5 +1,7 @@
+import time
 from typing import List, overload
 
+import numpy as np
 import pandas as pd
 from qiskit.circuit import QuantumCircuit
 from qiskit.circuit.library import TwoLocal, ZZFeatureMap
@@ -7,6 +9,13 @@ from qiskit_aer import AerSimulator
 from qiskit_algorithms.optimizers import SPSA
 from qiskit_ibm_runtime import Batch, SamplerV2
 from qiskit_ibm_runtime.qiskit_runtime_service import Backend, QiskitRuntimeService
+from sklearn.metrics import (
+    accuracy_score,
+    confusion_matrix,
+    f1_score,
+    precision_score,
+    recall_score,
+)
 from sklearn.model_selection import train_test_split
 
 
@@ -15,9 +24,14 @@ class QuantumClassifier:
     service: QiskitRuntimeService | None
     backend: Backend | None
     batch: Batch | None
+
     feature_map: ZZFeatureMap | None
-    variational: TwoLocal | None
+    var_form: TwoLocal | None
     full_circuit: QuantumCircuit | None
+    opt_var: List[float] | None
+
+    optimizer: SPSA | None
+
     test_size: float
     random_state: int
 
@@ -48,8 +62,9 @@ class QuantumClassifier:
         self.batch = Batch(backend=self.backend)
 
         self.feature_map = None
-        self.variational = None
+        self.var_form = None
         self.full_circuit = None
+        self.opt_var = None
 
         self.test_size = test_size
         self.random_state = random_state
@@ -79,7 +94,46 @@ class QuantumClassifier:
             X, y, test_size=self.test_size, random_state=self.random_state
         )
 
+        def objective_function(variational):
+            nonlocal X_train, y_train
+            return self.__cost_function(X_train, y_train, variational)
+
+        initial_point = np.zeros((self.var_form.num_parameters))
+
+        # Time the minimization
+        start_time = time.time()
+
+        result = self.optimizer.minimize(objective_function, initial_point)
+        self.opt_var = result.x
+
+        training_time = time.time() - start_time
+
+        start_time = time.time()
+
+        probability = self.__classification_probability(X_test, self.opt_var)
+        predictions = [0 if p[0] >= p[1] else 1 for p in probability]
+
+        testing_time = time.time() - start_time
+
+        print("###################################")
+        print("Training Results: ")
+        print(
+            f"Training Time: Seconds: {training_time}, Minutes: {training_time / 60.0}"
+        )
+        print(f"Testing Time: Seconds: {testing_time}, Minutes: {testing_time / 60.0}")
+        print("Accuracy: ", accuracy_score(y_test, predictions))
+        print("Precision: ", precision_score(y_test, predictions))
+        print("Recall: ", recall_score(y_test, predictions))
+        print("F1 Score: ", f1_score(y_test, predictions))
+        print("Confusion Matrix:\n", confusion_matrix(y_test, predictions))
+        print("###################################")
+
     def __initialize_circuit(self) -> None:
         self.feature_map = ZZFeatureMap(feature_dimension=5, reps=2)
         self.feature_map.barrier()
-        self.variational = TwoLocal(5, ["ry", "rz"], "cz", reps=3)
+        self.var_form = TwoLocal(5, ["ry", "rz"], "cz", reps=3)
+
+        self.full_circuit = self.feature_map.compose(self.var_form)
+        self.full_circuit.measure_all()
+
+        self.optimizer = SPSA(maxiter=50)
