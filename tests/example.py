@@ -29,11 +29,19 @@ dataset = pd.concat([fraud_data, non_fraud_data])
 print("Class distribution in reduced dataset:")
 print(dataset["class"].value_counts())
 
+# Training
+
+print("Training quantum classifier")
+
 qc = QuantumClassifier()
 qc.train(dataset, "class")
-prediction = qc.predict(np.array([[0.0, 0.0, 0.0, 0.0, 0.0]]))
 
-if prediction == 1:
+# Prediction
+
+test_df = pd.DataFrame(np.random.rand(5))
+prediction = qc.predict(test_df)
+
+if prediction[0] == 1:
     print("Prediction: Fraud")
 else:
     print("Prediction: Non-fraud")

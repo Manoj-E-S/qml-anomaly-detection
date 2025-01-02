@@ -102,7 +102,7 @@ class QuantumClassifier:
             nonlocal X_train, y_train
             return self.__cost_function(X_train, y_train, variational)
 
-        initial_point = np.zeros((self.var_form.num_parameters))
+        initial_point = np.random.rand(self.var_form.num_parameters)
 
         # Time the minimization
         start_time = time.time()
