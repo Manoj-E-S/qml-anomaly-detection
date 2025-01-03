@@ -16,8 +16,8 @@ dataset = cqp.dataframe[selected_features]
 print("Class distribution in original dataset:")
 print(dataset["class"].value_counts())
 
-total_rows = 100
-fraud_rows = 10
+total_rows = 2000
+fraud_rows = 200
 non_fraud_rows = total_rows - fraud_rows
 
 fraud_data = dataset[dataset["class"] == 1].sample(n=fraud_rows, random_state=42)
