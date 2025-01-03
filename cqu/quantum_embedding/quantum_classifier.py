@@ -197,4 +197,4 @@ class QuantumClassifier:
         self.full_circuit = self.feature_map.compose(self.var_form)
         self.full_circuit.measure_all()
 
-        self.optimizer = SPSA(maxiter=50)
+        self.optimizer = SPSA(maxiter=100)
