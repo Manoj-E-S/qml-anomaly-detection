@@ -1,6 +1,6 @@
 [project]
 name = "cqu"
-version = "0.1.0b"
+version = "0.1.1"
 authors = [
     { name="Manoj E S", email="johndoe@gmail.com" },
     { name="Ian Sushruth Tauro", email="sushruth127@gmail.com" },
@@ -8,7 +8,7 @@ authors = [
     { name="Aravind S N", email="aravindsn002@gmail.com" },
 ]
 description = "CQU is a Classical and Quantum Machine Learning Library that is built on top of Qiskit and PyTorch, giving easy access to both classical and quantum machine learning algorithms through simple interfaces. It is designed to be easy to use and to be easily extensible, including a Preprocessor class that allows for easy integration of new data preprocessing techniques."
-readme = "README.md"
+readme = "cqu/README.md"
 requires-python = "3.10"
 classifiers = [
     "Programming Language :: Python :: 3",
