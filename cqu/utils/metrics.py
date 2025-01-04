@@ -23,7 +23,7 @@ class ClassifierMetrics:
     report: str | dict
     accuracy: float
     confusion_matrix: np.ndarray
-    roc_c: tuple[np.ndarray, np.ndarray, np.ndarray]
+    roc_curve: tuple[np.ndarray, np.ndarray, np.ndarray]
     roc_auc: float
     class_weights: dict | None
 
@@ -66,7 +66,7 @@ class ClassifierMetrics:
             ["Metric", "Value"],
             ["Accuracy", self.accuracy],
             ["ROC AUC Score", self.roc_auc],
-            ["Threshold", self.roc_c[2]],
+            ["Threshold", self.roc_curve[2]],
         ]
 
         if self.class_weights is not None:
