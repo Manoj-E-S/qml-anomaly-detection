@@ -12,7 +12,6 @@ Provided abstract methods:
 from abc import ABC, abstractmethod
 from typing import TypeAlias, overload
 
-import numpy as np
 import pandas as pd
 from numpy.typing import ArrayLike
 

@@ -10,10 +10,12 @@ import numpy as np
 import pandas as pd
 from sklearn.metrics import (
     accuracy_score,
+    auc,
     confusion_matrix,
     f1_score,
     precision_score,
     recall_score,
+    roc_curve,
 )
 
 
@@ -24,6 +26,8 @@ class ClassifierMetrics:
     recall: float
     f1: float
     confusion_matrix: np.ndarray
+    roc_c: tuple[np.ndarray, np.ndarray, np.ndarray]
+    roc_auc: float
 
     def to_string(self) -> str:
         return (
@@ -49,5 +53,8 @@ def get_metrics(
     recall = recall_score(y_true, y_pred)
     f1 = f1_score(y_true, y_pred)
     cm = confusion_matrix(y_true, y_pred)
+    fpr, tpr, thresholds = roc_curve(y_true, y_pred)
+    roc_c = (fpr, tpr, thresholds)
+    roc_auc = auc(fpr, tpr)
 
-    return ClassifierMetrics(accuracy, precision, recall, f1, cm)
+    return ClassifierMetrics(accuracy, precision, recall, f1, cm, roc_c, roc_auc)

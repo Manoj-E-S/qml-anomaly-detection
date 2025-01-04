@@ -1,40 +1,53 @@
 from concurrent.futures import ThreadPoolExecutor
+
+import pandas as pd
+
 from cqu.classical_models.important_features import get_feature_importance
-from cqu.classical_models.models import logistic_regression_with_analysis, random_forest_with_analysis, gradient_boosting_with_analysis, knn_model_with_analysis, naive_bayes_model_with_analysis, neural_network_with_analysis
-import pandas as pd
-from cqu.classical_models.plotter import Plotter
+from cqu.classical_models.models import (
+    gradient_boosting_with_analysis,
+    knn_model_with_analysis,
+    logistic_regression_with_analysis,
+    naive_bayes_model_with_analysis,
+    neural_network_with_analysis,
+    random_forest_with_analysis,
+)
 from cqu.preprocessing import Preprocessor
-import pandas as pd
+from cqu.utils.plotting import Plotter
 
 plotter = Plotter(shouldPlot=False)
 
-def get_dataset(path:str) -> pd.DataFrame:
+
+def get_dataset(path: str) -> pd.DataFrame:
     cqp = Preprocessor(path)
 
-    selected_features = ['v17', 'v12', 'v14', 'v16', 'v10', 'class']
+    selected_features = ["v17", "v12", "v14", "v16", "v10", "class"]
     dataset = cqp.dataframe[selected_features]
 
     # Print row count of each class
     print("Class distribution in original dataset:")
-    print(dataset['class'].value_counts())
+    print(dataset["class"].value_counts())
 
     return dataset
 
 
-def reduce_dataset(dataset:pd.DataFrame, total_rows, class_1_rows) -> pd.DataFrame:
+def reduce_dataset(dataset: pd.DataFrame, total_rows, class_1_rows) -> pd.DataFrame:
     class_0_rows = total_rows - class_1_rows
 
-    class_1_data = dataset[dataset['class'] == 1].sample(n=class_1_rows, random_state=42)
-    class_0_data = dataset[dataset['class'] == 0].sample(n=class_0_rows, random_state=42)
+    class_1_data = dataset[dataset["class"] == 1].sample(
+        n=class_1_rows, random_state=42
+    )
+    class_0_data = dataset[dataset["class"] == 0].sample(
+        n=class_0_rows, random_state=42
+    )
     dataset = pd.concat([class_1_data, class_0_data])
 
     print("Class distribution in reduced dataset:")
-    print(dataset['class'].value_counts())
+    print(dataset["class"].value_counts())
 
     return dataset
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     print("Getting fraud dataset")
     df = get_dataset("../datasets/ccfraud/creditcard.csv")
     # df = reduce_dataset(df, 100, 10)
@@ -49,25 +62,37 @@ if __name__ == '__main__':
         feature_importances = get_feature_importance(df, target_column, top_n=5)
 
         for model, data in feature_importances.items():
-            features = data['Feature']
+            features = data["Feature"]
             print(f"{model}\n = {features}")
 
-        result = logistic_regression_with_analysis(df, target_column, feature_importances, shouldPlot=plotter.shouldPlot)
+        result = logistic_regression_with_analysis(
+            df, target_column, feature_importances, shouldPlot=plotter.shouldPlot
+        )
         plotter.log_model_metrics(result)
 
-        result = random_forest_with_analysis(df, target_column, feature_importances, shouldPlot=plotter.shouldPlot)
+        result = random_forest_with_analysis(
+            df, target_column, feature_importances, shouldPlot=plotter.shouldPlot
+        )
         plotter.log_model_metrics(result)
 
-        result = gradient_boosting_with_analysis(df, target_column, feature_importances, shouldPlot=plotter.shouldPlot)
+        result = gradient_boosting_with_analysis(
+            df, target_column, feature_importances, shouldPlot=plotter.shouldPlot
+        )
         plotter.log_model_metrics(result)
 
-        result = neural_network_with_analysis(df, target_column, feature_importances, shouldPlot=plotter.shouldPlot)
+        result = neural_network_with_analysis(
+            df, target_column, feature_importances, shouldPlot=plotter.shouldPlot
+        )
         plotter.log_model_metrics(result)
 
-        result = knn_model_with_analysis(df, target_column, feature_importances, 5, shouldPlot=plotter.shouldPlot)
+        result = knn_model_with_analysis(
+            df, target_column, feature_importances, 5, shouldPlot=plotter.shouldPlot
+        )
         plotter.log_model_metrics(result)
 
-        result = naive_bayes_model_with_analysis(df, target_column, feature_importances, shouldPlot=plotter.shouldPlot)
+        result = naive_bayes_model_with_analysis(
+            df, target_column, feature_importances, shouldPlot=plotter.shouldPlot
+        )
         plotter.log_model_metrics(result)
 
     else:
@@ -78,27 +103,38 @@ if __name__ == '__main__':
         feature_importances = get_feature_importance(df, target_column, top_n=5)
 
         for model, data in feature_importances.items():
-            features = data['Feature']
+            features = data["Feature"]
             print(f"{model}\n = {features}")
 
-
         def logistic_regression_analysis_wrapper():
-            return logistic_regression_with_analysis(df, target_column, feature_importances, shouldPlot=plotter.shouldPlot)
+            return logistic_regression_with_analysis(
+                df, target_column, feature_importances, shouldPlot=plotter.shouldPlot
+            )
 
         def random_forest_analysis_wrapper():
-            return random_forest_with_analysis(df, target_column, feature_importances, shouldPlot=plotter.shouldPlot)
+            return random_forest_with_analysis(
+                df, target_column, feature_importances, shouldPlot=plotter.shouldPlot
+            )
 
         def gradient_boosting_analysis_wrapper():
-            return gradient_boosting_with_analysis(df, target_column, feature_importances, shouldPlot=plotter.shouldPlot)
+            return gradient_boosting_with_analysis(
+                df, target_column, feature_importances, shouldPlot=plotter.shouldPlot
+            )
 
         def neural_network_analysis_wrapper():
-            return neural_network_with_analysis(df, target_column, feature_importances, shouldPlot=plotter.shouldPlot)
+            return neural_network_with_analysis(
+                df, target_column, feature_importances, shouldPlot=plotter.shouldPlot
+            )
 
         def knn_analysis_wrapper():
-            return knn_model_with_analysis(df, target_column, feature_importances, 5, shouldPlot=plotter.shouldPlot)
+            return knn_model_with_analysis(
+                df, target_column, feature_importances, 5, shouldPlot=plotter.shouldPlot
+            )
 
         def naive_bayes_analysis_wrapper():
-            return naive_bayes_model_with_analysis(df, target_column, feature_importances, shouldPlot=plotter.shouldPlot)
+            return naive_bayes_model_with_analysis(
+                df, target_column, feature_importances, shouldPlot=plotter.shouldPlot
+            )
 
         # Efeature_importancesecute the analysis functions in parallel
         print("Executing Various Classical Models")
@@ -111,7 +147,7 @@ if __name__ == '__main__':
                 executor.submit(knn_analysis_wrapper),
                 executor.submit(naive_bayes_analysis_wrapper),
             ]
-            
+
             # Wait for all tasks to complete and collect results
             for future in futures:
                 result = future.result()
