@@ -1,16 +1,17 @@
 # from cqu.quantum_embedding import QuantumClassifier
-from cqu.preprocessing import Preprocessor
 from sklearn.model_selection import train_test_split
+
+from cqu.preprocessing import Preprocessor
 
 print("Using fraud dataset")
 cqp = Preprocessor("./datasets/ccfraud/creditcard.csv")
 
-selected_features = ['v17', 'v12', 'v14', 'v16', 'v10', 'class']
+selected_features = ["v17", "v12", "v14", "v16", "v10", "class"]
 dataset = cqp.dataframe[selected_features]
 
 # Print row count of each class
 print("Class distribution in original dataset:")
-print(dataset['class'].value_counts())
+print(dataset["class"].value_counts())
 
 import pandas as pd
 
@@ -18,22 +19,26 @@ total_rows = 1000
 fraud_rows = 100
 non_fraud_rows = total_rows - fraud_rows
 
-fraud_data = dataset[dataset['class'] == 1].sample(n=fraud_rows, random_state=42)
-non_fraud_data = dataset[dataset['class'] == 0].sample(n=non_fraud_rows, random_state=42)
+fraud_data = dataset[dataset["class"] == 1].sample(n=fraud_rows, random_state=42)
+non_fraud_data = dataset[dataset["class"] == 0].sample(
+    n=non_fraud_rows, random_state=42
+)
 dataset = pd.concat([fraud_data, non_fraud_data])
 
 print("Class distribution in reduced dataset:")
-print(dataset['class'].value_counts())
+print(dataset["class"].value_counts())
 
-y = dataset['class'].values
-X = dataset.drop(columns=['class']).values
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+y = dataset["class"].values
+X = dataset.drop(columns=["class"]).values
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
 
 
 from qiskit_ibm_runtime import QiskitRuntimeService
 
 # QiskitRuntimeService.save_account(
-#     channel="ibm_quantum", 
+#     channel="ibm_quantum",
 #     token="4bccb8d54705ea83a2c6b462ec4cdbda2162bafbd46c2112975f2397fa24ba37eb56e08e1c99ba48b0b9d289c776414bb7a59bb435c0df65fadb21e46821bb17"
 # )
 
@@ -48,10 +53,9 @@ print("Using backend: ", backend)
 # import numpy as np
 
 from qiskit import QuantumCircuit
-from qiskit.circuit.library import ZZFeatureMap, TwoLocal
+from qiskit.circuit.library import TwoLocal, ZZFeatureMap
 from qiskit.primitives import StatevectorSampler
 from qiskit_algorithms.optimizers import SPSA
-
 
 features = X.shape[1]
 random_state = 42
@@ -59,7 +63,7 @@ shots = 1024
 
 feature_map = ZZFeatureMap(feature_dimension=features, reps=2)
 feature_map.barrier()
-var_form = TwoLocal(features, ['ry', 'rz'], 'cz', reps=2)
+var_form = TwoLocal(features, ["ry", "rz"], "cz", reps=2)
 
 full_circuit = QuantumCircuit(features)
 full_circuit.append(feature_map, range(features))
@@ -221,7 +225,6 @@ full_circuit.append(var_form, range(features))
 # result = optimizer.minimize(objective_function, initial_point)
 
 
-
 # opt_var = result.x
 # opt_value = result.fun
 
@@ -245,14 +248,13 @@ full_circuit.append(var_form, range(features))
 # print("Optimal parameters:", result['optimal_point'])
 # print("Final cost:", result['optimal_value'])
 
-from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister, transpile
+from qiskit import ClassicalRegister, QuantumCircuit, QuantumRegister, transpile
 from qiskit.circuit import Parameter
-from qiskit.circuit.library import ZZFeatureMap, TwoLocal
-from qiskit_machine_learning.neural_networks import SamplerQNN
-from qiskit_machine_learning.algorithms import NeuralNetworkClassifier
-from qiskit_ibm_runtime import SamplerV2, Batch
+from qiskit.circuit.library import TwoLocal, ZZFeatureMap
 from qiskit_algorithms.optimizers import COBYLA, SPSA
-from qiskit_machine_learning.algorithms import VQC
+from qiskit_ibm_runtime import Batch, SamplerV2
+from qiskit_machine_learning.algorithms import VQC, NeuralNetworkClassifier
+from qiskit_machine_learning.neural_networks import SamplerQNN
 
 # features = X.shape[1]
 
@@ -276,28 +278,28 @@ sampler = SamplerV2(mode=batch)
 #     qr = QuantumRegister(6, 'qr')
 #     cr = ClassicalRegister(1, 'cr')
 #     qc = QuantumCircuit(qr, cr)
-    
+
 #     # Encode input parameters
 #     for i, theta in enumerate(input_params):
 #         qc.ry(theta, qr[i])
-    
+
 #     # Create entanglement layers
 #     # First entanglement layer
 #     for i in range(4):
 #         qc.cx(qr[i], qr[i+1])
-    
+
 #     # Trainable rotation layer
 #     qc.ry(weight_params[0], qr[0])
 #     qc.ry(weight_params[1], qr[2])
 #     qc.ry(weight_params[2], qr[4])
-    
+
 #     # Second entanglement layer
 #     for i in range(0, 4, 2):
 #         qc.cx(qr[i], qr[i+1])
-    
+
 #     # Final measurement on the last qubit
 #     qc.measure(qr[5], cr[0])
-    
+
 #     return qc
 
 # # Create training data
@@ -313,11 +315,7 @@ print("Transpile the circuit")
 # transpiled_circuit = transpile(full_circuit, backend)
 transpiled_circuit = transpile(full_circuit, backend)
 
-vqc = VQC(
-    ansatz=transpiled_circuit,
-    optimizer=SPSA(maxiter=50),
-    sampler=sampler
-)
+vqc = VQC(ansatz=transpiled_circuit, optimizer=SPSA(maxiter=50), sampler=sampler)
 
 # qnn = SamplerQNN(
 #     circuit=transpiled_circuit,
@@ -344,7 +342,8 @@ print("Evaluating the model")
 # y_pred = classifier.predict(X_test)
 y_pred = vqc.predict(X_test)
 
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
+
 
 def evaluate_model(y_true, y_pred):
     """Calculate and print all evaluation metrics."""
@@ -352,16 +351,18 @@ def evaluate_model(y_true, y_pred):
     precision = precision_score(y_true, y_pred)
     recall = recall_score(y_true, y_pred)
     f1 = f1_score(y_true, y_pred)
-    
+
     print("\nModel Evaluation Metrics:")
     print(f"Accuracy: {accuracy:.4f}")
     print(f"Precision: {precision:.4f}")
     print(f"Recall: {recall:.4f}")
     print(f"F1 Score: {f1:.4f}")
 
+
 evaluate_model(y_test, y_pred)
 
 batch.close()
+
 
 def predict_fraud(transaction_data):
     """Predict if a transaction is fraudulent."""
