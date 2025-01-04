@@ -10,7 +10,7 @@ Provided abstract methods:
 """
 
 from abc import ABC, abstractmethod
-from typing import Any, TypeAlias, overload
+from typing import TypeAlias, overload
 
 import numpy as np
 import pandas as pd

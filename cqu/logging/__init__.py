@@ -7,4 +7,4 @@ use the logging module from the Python standard library instead.
 
 LOG_FOLDER_NAME = "cqu_logs"
 
-from .__logger import __Logger
+from .logger import Logger

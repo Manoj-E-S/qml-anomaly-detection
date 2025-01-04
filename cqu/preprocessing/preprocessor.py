@@ -5,7 +5,7 @@ from typing import Any, Callable, Dict, List, Optional, overload
 
 import pandas as pd
 
-from ..__logging import __Logger as Logger
+from ..logging import Logger
 from . import supported_readers, unsupported_message
 from .missing_values import MissingValueStrategies, handle_missing_values
 from .smote import smote_on_column
