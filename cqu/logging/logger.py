@@ -5,7 +5,7 @@ from datetime import datetime
 from . import LOG_FOLDER_NAME
 
 
-class __Logger:
+class Logger:
     log_buffer: str
     module_name: str
 
