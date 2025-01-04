@@ -4,6 +4,8 @@ This module provides the 'BaseClassifier' class along with some utility for inte
 use in the cqu module
 """
 
+PLOT_FOLDER_NAME = "cqu_plots"
+
 from .classifier import BaseClassifier
 from .metrics import ClassifierMetrics, get_metrics
 from .plotting import Plotter
