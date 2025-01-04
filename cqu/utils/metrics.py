@@ -1,6 +1,6 @@
 """
 'ClassifierMetrics' dataclass is used to store the metrics of a classifier. along with the helper
-function 'calculate_metrics' to calculate the metrics of a classifier given the true and predicted
+function 'get_metrics' to calculate the metrics of a classifier given the true and predicted
 values of the classifier.
 """
 

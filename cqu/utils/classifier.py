@@ -16,6 +16,8 @@ import numpy as np
 import pandas as pd
 from numpy.typing import ArrayLike
 
+from .metrics import ClassifierMetrics
+
 Dataset: TypeAlias = ArrayLike | pd.DataFrame
 
 
@@ -31,13 +33,15 @@ class BaseClassifier(ABC):
         pass
 
     @overload
-    def test(self, X_test: Dataset, y_test: ArrayLike) -> Any: ...
+    def test(self, X_test: Dataset, y_test: ArrayLike) -> ClassifierMetrics: ...
 
     @overload
-    def test(self, data: Dataset, target_column: str) -> Any: ...
+    def test(self, data: Dataset, target_column: str) -> ClassifierMetrics: ...
 
     @abstractmethod
-    def test(self, X_train_or_data: Dataset, y_test_or_target: ArrayLike | str) -> Any:
+    def test(
+        self, X_train_or_data: Dataset, y_test_or_target: ArrayLike | str
+    ) -> ClassifierMetrics:
         pass
 
     @abstractmethod
