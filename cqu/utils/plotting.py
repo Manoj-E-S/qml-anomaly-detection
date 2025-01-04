@@ -9,27 +9,44 @@ import seaborn as sns
 
 from .metrics import ClassifierMetrics
 
-matplotlib.use("Agg")
+
+def agg_plot(func):
+    def wrapper(*args, **kwargs):
+        original_backend = matplotlib.get_backend()
+        matplotlib.use("Agg", force=True)
+        try:
+            func(*args, **kwargs)
+        finally:
+            matplotlib.use(original_backend, force=True)
+
+    return wrapper
 
 
-def plot_cm(title, cm: np.ndarray):
+@agg_plot
+def plot_confusion_matrix(
+    model_name, confusion_matrix: np.ndarray, class_labels: List[str] = ["0", "1"]
+) -> None:
+    if len(class_labels) != 2:
+        raise ValueError("Class labels must be a list of length 2")
+
     plt.figure(figsize=(8, 6))
     sns.heatmap(
-        cm,
+        confusion_matrix,
         annot=True,
         fmt="d",
         cmap="Blues",
         cbar=False,
-        xticklabels=["Non-Fraud", "Fraud"],
-        yticklabels=["Non-Fraud", "Fraud"],
+        xticklabels=class_labels,
+        yticklabels=class_labels,
     )
     plt.title("Confusion Matrix")
     plt.xlabel("Predicted Label")
     plt.ylabel("True Label")
-    plt.savefig(f"./classical_images/{title}_CM.png")
+    plt.savefig(f"./classical_images/{model_name}_CM.png")
     plt.close()
 
 
+@agg_plot
 def plot_report(title, report: dict):
     report_df = pd.DataFrame(report).transpose()
     print(report_df.head(10))
@@ -47,12 +64,10 @@ def plot_report(title, report: dict):
     plt.close()
 
 
-def plot_roc_auc(title, y_test, y_proba):
-    # Calculate ROC curve
-    fpr, tpr, thresholds = roc_curve(y_test, y_proba)
-    roc_auc = auc(fpr, tpr)
+@agg_plot
+def plot_roc_auc(model_name, roc_curve, roc_auc):
+    fpr, tpr, _ = roc_curve
 
-    # Plotting the ROC curve
     plt.figure(figsize=(8, 6))
     plt.plot(fpr, tpr, color="blue", label="ROC Curve (area = {:.2f})".format(roc_auc))
     plt.plot([0, 1], [0, 1], color="red", linestyle="--")  # Diagonal line
@@ -61,11 +76,12 @@ def plot_roc_auc(title, y_test, y_proba):
     plt.ylabel("True Positive Rate")
     plt.legend(loc="lower right")
     plt.grid()
-    plt.savefig(f"./classical_images/{title}_rocauc.png")
+    plt.savefig(f"./classical_images/{model_name}_rocauc.png")
     plt.close()
 
 
-def visualize_feature_importance(model_name, selected_features, model):
+@agg_plot
+def plot_feature_importance(model_name, selected_features, model):
     if hasattr(model, "feature_importances_"):
         plt.figure(figsize=(8, 6))
         plt.barh(selected_features, model.feature_importances_)
@@ -74,12 +90,3 @@ def visualize_feature_importance(model_name, selected_features, model):
         plt.ylabel("Features")
         plt.savefig(f"./classical_images/{model_name}_feature_importance.png")
         plt.close()
-
-
-def print_results_to_stdout(title, report, roc_auc, threshold, class_weights=None):
-    print(title)
-    print("Classification Report:\n", report)
-    print("ROC AUC Score:", roc_auc)
-    print("threshold:", threshold)
-    if class_weights:
-        print("class_weights:", class_weights)
