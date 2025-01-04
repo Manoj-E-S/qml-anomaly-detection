@@ -25,6 +25,21 @@ class ClassifierMetrics:
     f1: float
     confusion_matrix: np.ndarray
 
+    def to_string(self) -> str:
+        return (
+            f"Accuracy: {self.accuracy}\n"
+            f"Precision: {self.precision}\n"
+            f"Recall: {self.recall}\n"
+            f"F1: {self.f1}\n"
+            f"Confusion Matrix:\n{self.confusion_matrix}"
+        )
+
+    def __str__(self) -> str:
+        return self.to_string()
+
+    def __repr__(self):
+        return self.to_string()
+
 
 def get_metrics(
     y_true: np.ndarray | pd.Series, y_pred: np.ndarray | pd.Series
