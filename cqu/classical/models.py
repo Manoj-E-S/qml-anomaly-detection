@@ -18,7 +18,6 @@ from xgboost import XGBClassifier
 
 from cqu.typing import ClassicalModels
 from cqu.utils.metrics import ClassifierMetrics, get_metrics
-from cqu.utils.plotting import plot_all_metrics
 
 
 def optimize_threshold(
@@ -131,8 +130,6 @@ def logistic_regression_with_analysis(
         class_weights,
     )
 
-    plot_all_metrics(metrics)
-
     return metrics
 
 
@@ -183,8 +180,6 @@ def random_forest_with_analysis(
         class_weights,
     )
 
-    plot_all_metrics(metrics)
-
     return metrics
 
 
@@ -230,8 +225,6 @@ def gradient_boosting_with_analysis(
     metrics = get_metrics(
         ClassicalModels.GRADIENT_BOOSTING, y_test, y_pred, feature_importances
     )
-
-    plot_all_metrics(metrics)
 
     return metrics
 
@@ -342,8 +335,6 @@ def neural_network_with_analysis(
             class_weights,
         )
 
-        plot_all_metrics(metrics)
-
     return metrics
 
 
@@ -383,8 +374,6 @@ def knn_model_with_analysis(
 
     metrics = get_metrics(ClassicalModels.KNN, y_test, y_pred, feature_importances)
 
-    plot_all_metrics(metrics)
-
     return metrics
 
 
@@ -423,7 +412,5 @@ def naive_bayes_model_with_analysis(
     metrics = get_metrics(
         ClassicalModels.NAIVE_BAYES, y_test, y_pred, feature_importances
     )
-
-    plot_all_metrics(metrics)
 
     return metrics

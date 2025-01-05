@@ -16,6 +16,7 @@ from cqu.classical.models import (
 from cqu.preprocessing import Preprocessor
 from cqu.utils import PLOT_FOLDER_NAME
 from cqu.utils.metrics import ClassifierMetrics
+from cqu.utils.plotting import plot_all_metrics
 
 
 def get_dataset(path: str) -> pd.DataFrame:
@@ -56,12 +57,21 @@ def log_model_metrics(metrics: ClassifierMetrics) -> None:
         f.write(metrics.to_string())
 
 
+should_plot = True
+
+
+def log_and_plot(metrics: ClassifierMetrics) -> None:
+    log_model_metrics(metrics)
+    if should_plot:
+        plot_all_metrics(metrics)
+
+
 if __name__ == "__main__":
     print("Getting fraud dataset")
     df = get_dataset("./datasets/ccfraud/creditcard.csv")
     df = reduce_dataset(df, 100, 10)
     target_column = "class"
-    parallel = True
+    parallel = False
 
     print("Getting feature importances")
 
@@ -89,32 +99,32 @@ if __name__ == "__main__":
         metrics = logistic_regression_with_analysis(
             df, target_column, feature_importances[ClassicalModels.LOGISTIC_REGRESSION]
         )
-        log_model_metrics(metrics)
+        log_and_plot(metrics)
 
         metrics = random_forest_with_analysis(
             df, target_column, feature_importances[ClassicalModels.RANDOM_FOREST]
         )
-        log_model_metrics(metrics)
+        log_and_plot(metrics)
 
         metrics = gradient_boosting_with_analysis(
             df, target_column, feature_importances[ClassicalModels.GRADIENT_BOOSTING]
         )
-        log_model_metrics(metrics)
+        log_and_plot(metrics)
 
         metrics = neural_network_with_analysis(
             df, target_column, feature_importances[ClassicalModels.NEURAL_NETWORK]
         )
-        log_model_metrics(metrics)
+        log_and_plot(metrics)
 
         metrics = knn_model_with_analysis(
             df, target_column, feature_importances[ClassicalModels.KNN]
         )
-        log_model_metrics(metrics)
+        log_and_plot(metrics)
 
         metrics = naive_bayes_model_with_analysis(
             df, target_column, feature_importances[ClassicalModels.NAIVE_BAYES]
         )
-        log_model_metrics(metrics)
+        log_and_plot(metrics)
 
     else:
         print("Executing in Parallel")
