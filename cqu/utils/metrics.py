@@ -18,9 +18,12 @@ from sklearn.metrics import (
 )
 from tabulate import tabulate
 
+from cqu.typing import ModelType
+
 
 @dataclass
 class ClassifierMetrics:
+    model_type: ModelType
     feature_importances: pd.DataFrame | None
     report: Dict
     accuracy: float
@@ -35,6 +38,7 @@ class ClassifierMetrics:
         confusion_matrix_str = self.__get_confusion_matrix_str()
 
         return (
+            f"Model Type: {self.model_type}\n\n"
             f"Classification Report:\n{classification_table_str}\n\n"
             f"Summary:\n{summary_table_str}\n\n"
             f"Confusion Matrix:\n{confusion_matrix_str}"
@@ -89,6 +93,7 @@ class ClassifierMetrics:
 
 
 def get_metrics(
+    model_type: ModelType,
     y_true: np.ndarray | pd.Series,
     y_pred: np.ndarray | pd.Series,
     feature_importances: pd.DataFrame = None,
@@ -102,6 +107,7 @@ def get_metrics(
     roc_auc = auc(fpr, tpr)
 
     return ClassifierMetrics(
+        model_type=model_type,
         feature_importances=feature_importances,
         report=report,
         accuracy=accuracy,

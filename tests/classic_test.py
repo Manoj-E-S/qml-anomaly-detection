@@ -48,10 +48,12 @@ def reduce_dataset(dataset: pd.DataFrame, total_rows, class_1_rows) -> pd.DataFr
     return dataset
 
 
-def log_model_metrics(model_name, result: ClassifierMetrics) -> None:
-    path = os.path.join(PLOT_FOLDER_NAME, f"{model_name}_evaluation_results.txt")
+def log_model_metrics(metrics: ClassifierMetrics) -> None:
+    path = os.path.join(
+        PLOT_FOLDER_NAME, f"{metrics.model_type}_evaluation_results.txt"
+    )
     with open(path, "w") as f:
-        f.write(result.to_string())
+        f.write(metrics.to_string())
 
 
 if __name__ == "__main__":
@@ -59,115 +61,105 @@ if __name__ == "__main__":
     df = get_dataset("./datasets/ccfraud/creditcard.csv")
     df = reduce_dataset(df, 100, 10)
     target_column = "class"
-    parallel = False
+    parallel = True
+
+    print("Getting feature importances")
+
+    top_n = 5
+    feature_importances = get_feature_importances(
+        {
+            ClassicalModels.LOGISTIC_REGRESSION: top_n,
+            ClassicalModels.RANDOM_FOREST: top_n,
+            ClassicalModels.GRADIENT_BOOSTING: top_n,
+            ClassicalModels.NEURAL_NETWORK: top_n,
+            ClassicalModels.KNN: top_n,
+            ClassicalModels.NAIVE_BAYES: top_n,
+        },
+        df,
+        target_column,
+    )
+
+    for model, data in feature_importances.items():
+        features = data["feature"]
+        print(f"{model}\n = {features}")
 
     if parallel == False:
-        print("Executing Sequentially, and plotting")
-
-        print("Getting feature importances")
-
-        top_n = 5
-
-        feature_importances = get_feature_importances(
-            {
-                ClassicalModels.LOGISTIC_REGRESSION: top_n,
-                ClassicalModels.RANDOM_FOREST: top_n,
-                ClassicalModels.GRADIENT_BOOSTING: top_n,
-                ClassicalModels.NEURAL_NETWORK: top_n,
-                ClassicalModels.KNN: top_n,
-                ClassicalModels.NAIVE_BAYES: top_n,
-            },
-            df,
-            target_column,
-        )
-
-        for model, data in feature_importances.items():
-            features = data["feature"]
-            print(f"{model}\n = {features}")
+        print("Executing Sequentially")
 
         metrics = logistic_regression_with_analysis(
             df, target_column, feature_importances[ClassicalModels.LOGISTIC_REGRESSION]
         )
-        log_model_metrics("Logistic Regression", metrics)
+        log_model_metrics(metrics)
 
-        # result = random_forest_with_analysis(
-        #     df, target_column, feature_importances, shouldPlot=plotter.shouldPlot
-        # )
-        # # plotter.log_model_metrics(result)
+        metrics = random_forest_with_analysis(
+            df, target_column, feature_importances[ClassicalModels.RANDOM_FOREST]
+        )
+        log_model_metrics(metrics)
 
-        # result = gradient_boosting_with_analysis(
-        #     df, target_column, feature_importances, shouldPlot=plotter.shouldPlot
-        # )
-        # # plotter.log_model_metrics(result)
+        metrics = gradient_boosting_with_analysis(
+            df, target_column, feature_importances[ClassicalModels.GRADIENT_BOOSTING]
+        )
+        log_model_metrics(metrics)
 
-        # result = neural_network_with_analysis(
-        #     df, target_column, feature_importances, shouldPlot=plotter.shouldPlot
-        # )
-        # # plotter.log_model_metrics(result)
+        metrics = neural_network_with_analysis(
+            df, target_column, feature_importances[ClassicalModels.NEURAL_NETWORK]
+        )
+        log_model_metrics(metrics)
 
-        # result = knn_model_with_analysis(
-        #     df, target_column, feature_importances, 5, shouldPlot=plotter.shouldPlot
-        # )
-        # # plotter.log_model_metrics(result)
+        metrics = knn_model_with_analysis(
+            df, target_column, feature_importances[ClassicalModels.KNN]
+        )
+        log_model_metrics(metrics)
 
-        # result = naive_bayes_model_with_analysis(
-        #     df, target_column, feature_importances, shouldPlot=plotter.shouldPlot
-        # )
-        # plotter.log_model_metrics(result)
+        metrics = naive_bayes_model_with_analysis(
+            df, target_column, feature_importances[ClassicalModels.NAIVE_BAYES]
+        )
+        log_model_metrics(metrics)
 
-    # else:
-    #     print("Executing in Parallel, and not plotting")
+    else:
+        print("Executing in Parallel")
 
-    #     print("Getting feature importances")
-    #     feature_importances = get_feature_importance(df, target_column, top_n=5)
+        print("Executing Various Classical Models")
+        with ThreadPoolExecutor() as executor:
+            futures = [
+                executor.submit(
+                    logistic_regression_with_analysis,
+                    df,
+                    target_column,
+                    feature_importances[ClassicalModels.LOGISTIC_REGRESSION],
+                ),
+                executor.submit(
+                    random_forest_with_analysis,
+                    df,
+                    target_column,
+                    feature_importances[ClassicalModels.RANDOM_FOREST],
+                ),
+                executor.submit(
+                    gradient_boosting_with_analysis,
+                    df,
+                    target_column,
+                    feature_importances[ClassicalModels.GRADIENT_BOOSTING],
+                ),
+                executor.submit(
+                    neural_network_with_analysis,
+                    df,
+                    target_column,
+                    feature_importances[ClassicalModels.NEURAL_NETWORK],
+                ),
+                executor.submit(
+                    knn_model_with_analysis,
+                    df,
+                    target_column,
+                    feature_importances[ClassicalModels.KNN],
+                ),
+                executor.submit(
+                    naive_bayes_model_with_analysis,
+                    df,
+                    target_column,
+                    feature_importances[ClassicalModels.NAIVE_BAYES],
+                ),
+            ]
 
-    #     for model, data in feature_importances.items():
-    #         features = data["Feature"]
-    #         print(f"{model}\n = {features}")
-
-    #     def logistic_regression_analysis_wrapper():
-    #         return logistic_regression_with_analysis(
-    #             df, target_column, feature_importances, shouldPlot=plotter.shouldPlot
-    #         )
-
-    #     def random_forest_analysis_wrapper():
-    #         return random_forest_with_analysis(
-    #             df, target_column, feature_importances, shouldPlot=plotter.shouldPlot
-    #         )
-
-    #     def gradient_boosting_analysis_wrapper():
-    #         return gradient_boosting_with_analysis(
-    #             df, target_column, feature_importances, shouldPlot=plotter.shouldPlot
-    #         )
-
-    #     def neural_network_analysis_wrapper():
-    #         return neural_network_with_analysis(
-    #             df, target_column, feature_importances, shouldPlot=plotter.shouldPlot
-    #         )
-
-    #     def knn_analysis_wrapper():
-    #         return knn_model_with_analysis(
-    #             df, target_column, feature_importances, 5, shouldPlot=plotter.shouldPlot
-    #         )
-
-    #     def naive_bayes_analysis_wrapper():
-    #         return naive_bayes_model_with_analysis(
-    #             df, target_column, feature_importances, shouldPlot=plotter.shouldPlot
-    #         )
-
-    #     # Efeature_importancesecute the analysis functions in parallel
-    #     print("Executing Various Classical Models")
-    #     with ThreadPoolExecutor() as executor:
-    #         futures = [
-    #             executor.submit(logistic_regression_analysis_wrapper),
-    #             executor.submit(random_forest_analysis_wrapper),
-    #             executor.submit(gradient_boosting_analysis_wrapper),
-    #             executor.submit(neural_network_analysis_wrapper),
-    #             executor.submit(knn_analysis_wrapper),
-    #             executor.submit(naive_bayes_analysis_wrapper),
-    #         ]
-
-    #         # Wait for all tasks to complete and collect results
-    #         for future in futures:
-    #             result = future.result()
-    #             plotter.log_model_metrics(result)
+            for future in futures:
+                result = future.result()
+                log_model_metrics(result)
