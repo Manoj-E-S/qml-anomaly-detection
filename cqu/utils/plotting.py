@@ -8,8 +8,10 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 
+from cqu.typing import ModelType
+
 from . import PLOT_FOLDER_NAME
-from .metrics import ClassifierMetrics, ModelType
+from .metrics import ClassifierMetrics
 
 backend_lock = Lock()
 

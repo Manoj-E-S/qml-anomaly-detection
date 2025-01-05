@@ -3,9 +3,9 @@ from concurrent.futures import ThreadPoolExecutor
 
 import pandas as pd
 
-from cqu.classical import ClassicalModels
-from cqu.classical.important_features import get_feature_importances
-from cqu.classical.models import (
+from cqu.classical import (
+    ClassicalModels,
+    get_feature_importances,
     gradient_boosting_with_analysis,
     knn_model_with_analysis,
     logistic_regression_with_analysis,

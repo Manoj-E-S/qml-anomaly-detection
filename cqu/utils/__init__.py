@@ -11,3 +11,10 @@ os.makedirs(PLOT_FOLDER_NAME, exist_ok=True)
 
 from .classifier import BaseClassifier
 from .metrics import ClassifierMetrics, get_metrics
+from .plotting import (
+    plot_all_metrics,
+    plot_confusion_matrix,
+    plot_feature_importance,
+    plot_report,
+    plot_roc_auc,
+)

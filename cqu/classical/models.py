@@ -1,4 +1,3 @@
-from enum import Enum
 from typing import Dict
 
 import numpy as np
@@ -16,11 +15,12 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.preprocessing import StandardScaler
 from xgboost import XGBClassifier
 
-from cqu.typing import ClassicalModels
 from cqu.utils.metrics import ClassifierMetrics, get_metrics
 
+from . import ClassicalModels
 
-def optimize_threshold(
+
+def _optimize_threshold(
     y_proba: ArrayLike, y_test: ArrayLike, step: float = 0.01, use_roc: bool = False
 ) -> float:
     """
@@ -118,7 +118,7 @@ def logistic_regression_with_analysis(
     y_proba = model.predict_proba(X_test)[:, 1]
 
     if threshold is None:
-        threshold = optimize_threshold(y_proba, y_test, step=0.01, use_roc=True)
+        threshold = _optimize_threshold(y_proba, y_test, step=0.01, use_roc=True)
 
     y_pred = (y_proba >= threshold).astype(int)
 
@@ -168,7 +168,7 @@ def random_forest_with_analysis(
     y_proba = model.predict_proba(X_test)[:, 1]
 
     if threshold is None:
-        threshold = optimize_threshold(y_proba, y_test, step=0.01, use_roc=True)
+        threshold = _optimize_threshold(y_proba, y_test, step=0.01, use_roc=True)
 
     y_pred = (y_proba >= threshold).astype(int)
 
@@ -218,7 +218,7 @@ def gradient_boosting_with_analysis(
     y_proba = model.predict_proba(X_test)[:, 1]
 
     if threshold is None:
-        threshold = optimize_threshold(y_proba, y_test, step=0.01, use_roc=True)
+        threshold = _optimize_threshold(y_proba, y_test, step=0.01, use_roc=True)
 
     y_pred = (y_proba >= threshold).astype(int)
 
@@ -318,7 +318,7 @@ def neural_network_with_analysis(
     model.eval()
     with torch.no_grad():
         test_outputs = model(X_test_tensor)
-        threshold = optimize_threshold(
+        threshold = _optimize_threshold(
             test_outputs.cpu().numpy().flatten(), y_test, 0.01
         )
         test_predictions_array = (
@@ -369,7 +369,7 @@ def knn_model_with_analysis(
 
     y_proba = knn.predict_proba(X_test)[:, 1]
 
-    threshold = optimize_threshold(y_proba, y_test, 0.01)
+    threshold = _optimize_threshold(y_proba, y_test, 0.01)
     y_pred = (y_proba >= threshold).astype(int)
 
     metrics = get_metrics(ClassicalModels.KNN, y_test, y_pred, feature_importances)
@@ -406,7 +406,7 @@ def naive_bayes_model_with_analysis(
 
     y_proba = naive_bayes.predict_proba(X_test)[:, 1]
 
-    threshold = optimize_threshold(y_proba, y_test, 0.01)
+    threshold = _optimize_threshold(y_proba, y_test, 0.01)
     y_pred = (y_proba >= threshold).astype(int)
 
     metrics = get_metrics(
