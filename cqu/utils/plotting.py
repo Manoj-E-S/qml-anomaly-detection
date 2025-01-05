@@ -23,6 +23,12 @@ def agg_plot(func):
     return wrapper
 
 
+def plot_all_metrics(model_name: str, metrics: ClassifierMetrics) -> None:
+    plot_confusion_matrix(model_name, metrics.confusion_matrix)
+    plot_report(model_name, metrics.report)
+    plot_roc_auc(model_name, metrics.roc_curve, metrics.roc_auc)
+
+
 @agg_plot
 def plot_confusion_matrix(
     model_name: str, confusion_matrix: np.ndarray, class_labels: List[str] = ["0", "1"]

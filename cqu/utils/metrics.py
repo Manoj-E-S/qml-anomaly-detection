@@ -20,6 +20,7 @@ from tabulate import tabulate
 
 @dataclass
 class ClassifierMetrics:
+    feature_importances: dict | None
     report: str | dict
     accuracy: float
     confusion_matrix: np.ndarray

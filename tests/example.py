@@ -10,7 +10,7 @@ from sklearn.metrics import (
 from sklearn.model_selection import train_test_split
 
 from cqu.preprocessing import Preprocessor
-from cqu.quantum_embedding import QuantumClassifier
+from cqu.quantum import QuantumClassifier
 
 # Preprocessing
 

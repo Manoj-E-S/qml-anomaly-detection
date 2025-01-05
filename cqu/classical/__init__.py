@@ -28,6 +28,13 @@ Typical usage example:
 
 """
 
-# from .missing_values import MissingValueStrategies
-# from .preprocessor import Preprocessor
-# from .standardization import StringStandardizers
+from enum import Enum
+
+
+class ClassicalModels(Enum):
+    LOGISTIC_REGRESSION = "logistic_regression"
+    RANDOM_FOREST = "random_forest"
+    GRADIENT_BOOSTING = "gradient_boosting"
+    NEURAL_NETWORK = "neural_network"
+    KNN = "knn"
+    NAIVE_BAYES = "naive_bayes"

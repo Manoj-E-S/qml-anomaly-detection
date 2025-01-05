@@ -17,8 +17,6 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.preprocessing import StandardScaler
 from xgboost import XGBClassifier
 
-from cqu.utils.plotting import Plotter
-
 
 def optimize_threshold(y_proba, y_test, step=0.01, useROC=False):
     """

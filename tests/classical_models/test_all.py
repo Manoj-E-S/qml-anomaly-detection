@@ -1,7 +1,7 @@
 from concurrent.futures import ThreadPoolExecutor
 
-from cqu.classical_models.important_features import get_feature_importance
-from cqu.classical_models.models import (
+from cqu.classical.important_features import get_feature_importance
+from cqu.classical.models import (
     gradient_boosting_with_analysis,
     knn_model_with_analysis,
     logistic_regression_with_analysis,
@@ -17,7 +17,7 @@ from . import get_dataset, reduce_dataset
 def all_models_helper(df, target_column, parallel=True):
 
     print("Getting feature importances")
-    feature_importances = get_feature_importance(df, target_column, top_n=5)
+    feature_importances = get_feature_importance(df, target_column, extract_top_n=5)
 
     for model, data in feature_importances.items():
         features = data["Feature"]
@@ -28,7 +28,7 @@ def all_models_helper(df, target_column, parallel=True):
         plotter = Plotter(shouldPlot=True)
 
         print("Getting feature importances")
-        feature_importances = get_feature_importance(df, target_column, top_n=5)
+        feature_importances = get_feature_importance(df, target_column, extract_top_n=5)
 
         for model, data in feature_importances.items():
             features = data["Feature"]
@@ -70,7 +70,7 @@ def all_models_helper(df, target_column, parallel=True):
     plotter = Plotter(shouldPlot=False)
 
     print("Getting feature importances")
-    feature_importances = get_feature_importance(df, target_column, top_n=5)
+    feature_importances = get_feature_importance(df, target_column, extract_top_n=5)
 
     for model, data in feature_importances.items():
         features = data["Feature"]
