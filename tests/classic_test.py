@@ -1,3 +1,4 @@
+import os
 from concurrent.futures import ThreadPoolExecutor
 
 import pandas as pd
@@ -13,6 +14,8 @@ from cqu.classical.models import (
     random_forest_with_analysis,
 )
 from cqu.preprocessing import Preprocessor
+from cqu.utils import PLOT_FOLDER_NAME
+from cqu.utils.metrics import ClassifierMetrics
 
 
 def get_dataset(path: str) -> pd.DataFrame:
@@ -45,10 +48,16 @@ def reduce_dataset(dataset: pd.DataFrame, total_rows, class_1_rows) -> pd.DataFr
     return dataset
 
 
+def log_model_metrics(model_name, result: ClassifierMetrics) -> None:
+    path = os.path.join(PLOT_FOLDER_NAME, f"{model_name}_evaluation_results.txt")
+    with open(path, "w") as f:
+        f.write(result.to_string())
+
+
 if __name__ == "__main__":
     print("Getting fraud dataset")
     df = get_dataset("./datasets/ccfraud/creditcard.csv")
-    df = reduce_dataset(df, 1000, 50)
+    df = reduce_dataset(df, 100, 10)
     target_column = "class"
     parallel = False
 
@@ -56,6 +65,7 @@ if __name__ == "__main__":
         print("Executing Sequentially, and plotting")
 
         print("Getting feature importances")
+
         top_n = 5
 
         feature_importances = get_feature_importances(
@@ -75,10 +85,10 @@ if __name__ == "__main__":
             features = data["feature"]
             print(f"{model}\n = {features}")
 
-        # result = logistic_regression_with_analysis(
-        #     df, target_column, feature_importances, shouldPlot=plotter.shouldPlot
-        # )
-        # # plotter.log_model_metrics(result)
+        metrics = logistic_regression_with_analysis(
+            df, target_column, feature_importances[ClassicalModels.LOGISTIC_REGRESSION]
+        )
+        log_model_metrics("Logistic Regression", metrics)
 
         # result = random_forest_with_analysis(
         #     df, target_column, feature_importances, shouldPlot=plotter.shouldPlot

@@ -27,6 +27,7 @@ def plot_all_metrics(model_name: str, metrics: ClassifierMetrics) -> None:
     plot_confusion_matrix(model_name, metrics.confusion_matrix)
     plot_report(model_name, metrics.report)
     plot_roc_auc(model_name, metrics.roc_curve, metrics.roc_auc)
+    plot_feature_importance(model_name, metrics.feature_importances)
 
 
 @agg_plot
@@ -54,7 +55,7 @@ def plot_confusion_matrix(
 
 
 @agg_plot
-def plot_report(model_name: str, classification_report: dict):
+def plot_report(model_name: str, classification_report: dict) -> None:
     report_df = pd.DataFrame(classification_report).transpose()
     tick_labels = report_df.index
 
@@ -71,7 +72,11 @@ def plot_report(model_name: str, classification_report: dict):
 
 
 @agg_plot
-def plot_roc_auc(model_name, roc_curve, roc_auc):
+def plot_roc_auc(
+    model_name: str,
+    roc_curve: tuple[np.ndarray, np.ndarray, np.ndarray],
+    roc_auc: float,
+) -> None:
     fpr, tpr, _ = roc_curve
 
     plt.figure(figsize=(8, 6))
@@ -87,14 +92,16 @@ def plot_roc_auc(model_name, roc_curve, roc_auc):
 
 
 @agg_plot
-def plot_feature_importance(model_name, selected_features, model):
-    if hasattr(model, "feature_importances_"):
-        plt.figure(figsize=(8, 6))
-        plt.barh(selected_features, model.feature_importances_)
-        plt.title(f"Feature Importance in {model_name}")
-        plt.xlabel("Importance Score")
-        plt.ylabel("Features")
-        plt.savefig(
-            os.path.join(PLOT_FOLDER_NAME, f"{model_name}_feature_importance.png")
-        )
-        plt.close()
+def plot_feature_importance(
+    model_name: str, feature_importances: pd.DataFrame | None
+) -> None:
+    if feature_importances is None:
+        return
+
+    plt.figure(figsize=(8, 6))
+    plt.barh(feature_importances["feature"], feature_importances["importance"])
+    plt.title(f"Feature Importance in {model_name}")
+    plt.xlabel("Importance Score")
+    plt.ylabel("Features")
+    plt.savefig(os.path.join(PLOT_FOLDER_NAME, f"{model_name}_feature_importance.png"))
+    plt.close()

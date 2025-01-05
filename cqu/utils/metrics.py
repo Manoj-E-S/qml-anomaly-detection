@@ -5,6 +5,7 @@ values of the classifier.
 """
 
 from dataclasses import dataclass
+from typing import Dict
 
 import numpy as np
 import pandas as pd
@@ -20,13 +21,13 @@ from tabulate import tabulate
 
 @dataclass
 class ClassifierMetrics:
-    feature_importances: dict | None
-    report: str | dict
+    feature_importances: pd.DataFrame | None
+    report: Dict
     accuracy: float
     confusion_matrix: np.ndarray
     roc_curve: tuple[np.ndarray, np.ndarray, np.ndarray]
     roc_auc: float
-    class_weights: dict | None
+    class_weights: Dict[int | str, float] | None
 
     def to_string(self) -> str:
         classification_table_str = self.__get_classifcation_table_str()
@@ -44,7 +45,7 @@ class ClassifierMetrics:
             ["Class", "Precision", "Recall", "F1-Score", "Support"],
         ]
 
-        for cls, metrics in classification_report.items():
+        for cls, metrics in self.report.items():
             if cls not in ["accuracy"]:
                 classification_table.append(
                     [
@@ -67,7 +68,7 @@ class ClassifierMetrics:
             ["Metric", "Value"],
             ["Accuracy", self.accuracy],
             ["ROC AUC Score", self.roc_auc],
-            ["Threshold", self.roc_curve[2]],
+            ["Threshold", self.roc_curve[2][1]],
         ]
 
         if self.class_weights is not None:
@@ -88,7 +89,10 @@ class ClassifierMetrics:
 
 
 def get_metrics(
-    y_true: np.ndarray | pd.Series, y_pred: np.ndarray | pd.Series
+    y_true: np.ndarray | pd.Series,
+    y_pred: np.ndarray | pd.Series,
+    feature_importances: pd.DataFrame = None,
+    class_wieghts: dict = None,
 ) -> ClassifierMetrics:
     report = classification_report(y_true, y_pred, output_dict=True)
     accuracy = accuracy_score(y_true, y_pred)
@@ -97,4 +101,12 @@ def get_metrics(
     roc_c = (fpr, tpr, thresholds)
     roc_auc = auc(fpr, tpr)
 
-    return ClassifierMetrics(accuracy, report, cm, roc_c, roc_auc)
+    return ClassifierMetrics(
+        feature_importances=feature_importances,
+        report=report,
+        accuracy=accuracy,
+        confusion_matrix=cm,
+        roc_curve=roc_c,
+        roc_auc=roc_auc,
+        class_weights=class_wieghts,
+    )

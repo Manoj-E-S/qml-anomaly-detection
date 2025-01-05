@@ -19,6 +19,9 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.preprocessing import StandardScaler
 from xgboost import XGBClassifier
 
+from cqu.utils.metrics import get_metrics
+from cqu.utils.plotting import plot_all_metrics
+
 
 class ClassicalModels(Enum):
     LOGISTIC_REGRESSION = "logistic_regression"
@@ -47,8 +50,7 @@ def optimize_threshold(y_proba, y_test, step=0.01, useROC=False):
         fpr, tpr, thresholds = roc_curve(y_test, y_proba)
         gmeans = (tpr * (1 - fpr)) ** 0.5
         optimal_idx = gmeans.argmax()
-        threshold = 1 - thresholds[optimal_idx]
-        return threshold
+        return thresholds[optimal_idx]
 
     best_threshold = 0.0
     best_f1_score = 0.0
@@ -75,7 +77,11 @@ def optimize_threshold(y_proba, y_test, step=0.01, useROC=False):
 
 
 def logistic_regression_with_analysis(
-    data, target_column, important_features, threshold=None, shouldPlot=False
+    data,
+    target_column,
+    feature_importances,
+    random_state: int = 42,
+    threshold=None,
 ):
     """
     Builds a logistic regression model using ROC curve analysis to determine the best threshold
@@ -90,11 +96,8 @@ def logistic_regression_with_analysis(
     Returns:
     - dict: A dictionary containing precision, recall, F1-score, ROC AUC score, and the classification report.
     """
-    plotter = Plotter(shouldPlot=shouldPlot)
-
-    feature_names = important_features["logistic_regression"]["Feature"].tolist()
+    feature_names = feature_importances["feature"].tolist()
     # feature_names = ['Amount', 'V3', 'V14', 'V17', 'V9']
-    plotter.set_selected_features(feature_names)
 
     # Separate features and target
     X = data[feature_names]
@@ -107,14 +110,13 @@ def logistic_regression_with_analysis(
 
     # Compute class weights
     class_weights = {
-        0: len(y) / (2 * (y == 0).sum()),
-        1: len(y) / (2 * (y == 1).sum()),
-    }  # change class weights formulae
-    class_weights = {0: 1, 1: 35}
+        0: 1,
+        1: 35,
+    }
 
     # Fit Logistic Regression model
     model = LogisticRegression(
-        max_iter=1000, random_state=42, class_weight=class_weights
+        max_iter=1000, random_state=random_state, class_weight=class_weights
     )
     model.fit(X_train, y_train)
 
@@ -129,27 +131,12 @@ def logistic_regression_with_analysis(
     y_pred = (y_proba >= threshold).astype(int)
 
     # Generate evaluation metrics
-    dict_report = classification_report(y_test, y_pred, output_dict=True)
-    report = classification_report(y_test, y_pred)
-    roc_auc = roc_auc_score(y_test, y_proba)
+    metrics = get_metrics(y_test, y_pred, feature_importances, class_weights)
 
     # Print metrics
-    plotter.print_results_to_stdout(
-        "\n\nLogistic Regression", report, roc_auc, threshold, class_weights
-    )
-    plotter.visualize_feature_importance("logistic_regression", model)
-    plotter.plot_cm("LogisticRegression", confusion_matrix(y_test, y_pred))
-    plotter.plot_report("LogisticRegression", dict_report)
-    plotter.plot_roc_auc("LogisticRegression", y_test, y_proba)
+    plot_all_metrics("Logistic Regression", metrics)
 
-    results = {
-        "model_name": "LogisticRegression",
-        "classification_report": dict_report,
-        "roc_auc_score": roc_auc,
-        "threshold": threshold,
-        "class_weights": class_weights,
-    }
-    return results
+    return metrics
 
 
 def random_forest_with_analysis(
