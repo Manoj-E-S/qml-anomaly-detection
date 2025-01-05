@@ -21,7 +21,7 @@ from cqu.utils.metrics import ClassifierMetrics, get_metrics
 
 
 def optimize_threshold(
-    y_proba: ArrayLike, y_test: ArrayLike, step: float = 0.01, useROC: bool = False
+    y_proba: ArrayLike, y_test: ArrayLike, step: float = 0.01, use_roc: bool = False
 ) -> float:
     """
     Find the optimal threshold that maximizes the F1-score for class 1.
@@ -35,7 +35,7 @@ def optimize_threshold(
         dict: Dictionary containing the optimal threshold, corresponding F1-score, and the classification report.
     """
 
-    if useROC:
+    if use_roc:
         threshold = None
         fpr, tpr, thresholds = roc_curve(y_test, y_proba)
         gmeans = (tpr * (1 - fpr)) ** 0.5
@@ -118,7 +118,7 @@ def logistic_regression_with_analysis(
     y_proba = model.predict_proba(X_test)[:, 1]
 
     if threshold is None:
-        threshold = optimize_threshold(y_proba, y_test, step=0.01, useROC=True)
+        threshold = optimize_threshold(y_proba, y_test, step=0.01, use_roc=True)
 
     y_pred = (y_proba >= threshold).astype(int)
 
@@ -168,7 +168,7 @@ def random_forest_with_analysis(
     y_proba = model.predict_proba(X_test)[:, 1]
 
     if threshold is None:
-        threshold = optimize_threshold(y_proba, y_test, step=0.01, useROC=True)
+        threshold = optimize_threshold(y_proba, y_test, step=0.01, use_roc=True)
 
     y_pred = (y_proba >= threshold).astype(int)
 
@@ -218,7 +218,7 @@ def gradient_boosting_with_analysis(
     y_proba = model.predict_proba(X_test)[:, 1]
 
     if threshold is None:
-        threshold = optimize_threshold(y_proba, y_test, step=0.01, useROC=True)
+        threshold = optimize_threshold(y_proba, y_test, step=0.01, use_roc=True)
 
     y_pred = (y_proba >= threshold).astype(int)
 
