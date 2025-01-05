@@ -8,4 +8,3 @@ PLOT_FOLDER_NAME = "cqu_plots"
 
 from .classifier import BaseClassifier
 from .metrics import ClassifierMetrics, get_metrics
-from .plotting import Plotter

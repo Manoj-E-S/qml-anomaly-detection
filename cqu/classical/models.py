@@ -1,3 +1,5 @@
+from enum import Enum
+
 import numpy as np
 import pandas as pd
 import torch
@@ -16,6 +18,15 @@ from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.preprocessing import StandardScaler
 from xgboost import XGBClassifier
+
+
+class ClassicalModels(Enum):
+    LOGISTIC_REGRESSION = "logistic_regression"
+    RANDOM_FOREST = "random_forest"
+    GRADIENT_BOOSTING = "gradient_boosting"
+    NEURAL_NETWORK = "neural_network"
+    KNN = "knn"
+    NAIVE_BAYES = "naive_bayes"
 
 
 def optimize_threshold(y_proba, y_test, step=0.01, useROC=False):

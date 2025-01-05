@@ -2,7 +2,8 @@ from concurrent.futures import ThreadPoolExecutor
 
 import pandas as pd
 
-from cqu.classical.important_features import get_feature_importance
+from cqu.classical import ClassicalModels
+from cqu.classical.important_features import get_feature_importances
 from cqu.classical.models import (
     gradient_boosting_with_analysis,
     knn_model_with_analysis,
@@ -55,10 +56,23 @@ if __name__ == "__main__":
         print("Executing Sequentially, and plotting")
 
         print("Getting feature importances")
-        feature_importances = get_feature_importance(df, target_column, extract_top_n=5)
+        top_n = 5
+
+        feature_importances = get_feature_importances(
+            {
+                ClassicalModels.LOGISTIC_REGRESSION: top_n,
+                ClassicalModels.RANDOM_FOREST: top_n,
+                ClassicalModels.GRADIENT_BOOSTING: top_n,
+                ClassicalModels.NEURAL_NETWORK: top_n,
+                ClassicalModels.KNN: top_n,
+                ClassicalModels.NAIVE_BAYES: top_n,
+            },
+            df,
+            target_column,
+        )
 
         for model, data in feature_importances.items():
-            features = data["Feature"]
+            features = data["feature"]
             print(f"{model}\n = {features}")
 
         # result = logistic_regression_with_analysis(

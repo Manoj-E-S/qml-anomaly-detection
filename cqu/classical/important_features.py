@@ -1,5 +1,5 @@
 from concurrent.futures import ThreadPoolExecutor
-from typing import Dict, List, Tuple
+from typing import Dict
 
 import numpy as np
 import pandas as pd
@@ -24,8 +24,8 @@ def logistic_regression_importance(
     importance = np.abs(model.coef_[0])
     feature_names = X_train.columns
     return (
-        pd.DataFrame({"Feature": feature_names, "Importance": importance})
-        .sort_values(by="Importance", ascending=False)
+        pd.DataFrame({"feature": feature_names, "importance": importance})
+        .sort_values(by="importance", ascending=False)
         .head(extract_top_n)
     )
 
@@ -38,8 +38,8 @@ def random_forest_importance(
     importance = model.feature_importances_
     feature_names = X_train.columns
     return (
-        pd.DataFrame({"Feature": feature_names, "Importance": importance})
-        .sort_values(by="Importance", ascending=False)
+        pd.DataFrame({"feature": feature_names, "importance": importance})
+        .sort_values(by="importance", ascending=False)
         .head(extract_top_n)
     )
 
@@ -52,8 +52,8 @@ def gradient_boosting_importance(
     importance = model.feature_importances_
     feature_names = X_train.columns
     return (
-        pd.DataFrame({"Feature": feature_names, "Importance": importance})
-        .sort_values(by="Importance", ascending=False)
+        pd.DataFrame({"feature": feature_names, "importance": importance})
+        .sort_values(by="importance", ascending=False)
         .head(extract_top_n)
     )
 
@@ -66,8 +66,8 @@ def neural_network_importance(
     importance = np.mean(np.abs(model.coefs_[0]), axis=1)  # Input layer weights
     feature_names = X_train.columns
     return (
-        pd.DataFrame({"Feature": feature_names, "Importance": importance})
-        .sort_values(by="Importance", ascending=False)
+        pd.DataFrame({"feature": feature_names, "importance": importance})
+        .sort_values(by="importance", ascending=False)
         .head(extract_top_n)
     )
 
@@ -81,8 +81,8 @@ def knn_importance(
     importance = correlation.values
     feature_names = X_train.columns
     return (
-        pd.DataFrame({"Feature": feature_names, "Importance": importance})
-        .sort_values(by="Importance", ascending=False)
+        pd.DataFrame({"feature": feature_names, "importance": importance})
+        .sort_values(by="importance", ascending=False)
         .head(extract_top_n)
     )
 
@@ -99,7 +99,7 @@ def naive_bayes_importance(
     feature_names = X_train.columns
     return (
         pd.DataFrame({"feature": feature_names, "importance": importance})
-        .sort_values(by="Importance", ascending=False)
+        .sort_values(by="importance", ascending=False)
         .head(extract_top_n)
     )
 
@@ -119,19 +119,18 @@ def get_feature_importances(
     data: Dataset,
     target_column: str,
     random_state: int = 42,
-) -> dict:
+) -> Dict[str, pd.DataFrame]:
     """
     Identifies the most important features for a given model type.
 
     Parameters:
-    - data (pd.DataFrame): The input dataset.
+    - model_List (Dict[ClassicalModels, int]): A dictionary with model types as keys and the number of top features to return as values.
+    - data (Dataset): A dataframe or array-like object containing the dataset.
     - target_column (str): The name of the target variable column.
-    - model_type (str): Type of model (model_type, 'random_forest', 'gradient_boosting',
-                        'neural_network', 'knn', 'naive_bayes').
-    - top_n (int): Number of top features to return.
+    - random_state (int): The random seed to use for reproducibility.
 
     Returns:
-    - pd.DataFrame: A dataframe with the most important features and their importance scores.
+    - Dict[str, pd.DataFrame]: A dict with model names as keys and the top features as values.
     """
     global model_to_function
 
