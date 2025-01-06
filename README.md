@@ -95,8 +95,13 @@ Follow these steps to set up the `qml-anomaly-detection` project using Poetry:
     ├── KDD Cup 1999/ <br>
     └── README.md <br>
 
+11. **Setup pre-commit to ensure consistency**
+    ```
+    pre-commit install
+    ```
 
-11. **Run Your Project**:
+
+13. **Run Your Project**:
     ```sh
     poetry shell
     python <your_script>.py
