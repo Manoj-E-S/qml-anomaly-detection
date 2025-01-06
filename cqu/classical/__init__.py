@@ -12,8 +12,17 @@ b. To be able to select important features
 """
 
 from enum import Enum
+from typing import Union
+
+from sklearn.base import BaseEstimator
+from torch import nn
 
 from cqu.typing import ClassicalModels
+
+ClassicalModelTypes = Union[
+    BaseEstimator, # For scikit-learn models
+    nn.Module, # For PyTorch neural networks
+]
 
 from .important_features import (
     get_feature_importances,
@@ -25,6 +34,8 @@ from .important_features import (
     random_forest_importance,
 )
 from .models import (
+    ensemble_model_with_analysis,
+    get_the_best_classical_model,
     gradient_boosting_with_analysis,
     knn_model_with_analysis,
     logistic_regression_with_analysis,

@@ -44,6 +44,9 @@ class ClassifierMetrics:
             f"Confusion Matrix:\n{confusion_matrix_str}"
         )
 
+    def get_report(self) -> Dict:
+        return self.report
+
     def __get_classifcation_table_str(self) -> str:
         classification_table = [
             ["Class", "Precision", "Recall", "F1-Score", "Support"],
