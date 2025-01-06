@@ -24,7 +24,7 @@ class QuantumSVM(BaseClassifier):
         random_state: int = 42,
         test_size: float = 0.2,
         custom_kernal: Callable[[ArrayLike, ArrayLike], ArrayLike] | None = None,
-    ):
+    ) -> None:
         self.num_features = num_features
         self.threshold = None
         self.scaler = MaxAbsScaler()
@@ -76,11 +76,13 @@ class QuantumSVM(BaseClassifier):
 
         return y_pred
 
-    def reinitialize_kernel(self, num_features: int):
+    def reinitialize_kernel(self, num_features: int) -> None:
         self.num_features = num_features
         self.qsvm.kernel = self.__get_quantum_kernel(num_qubits=self.num_features)
 
-    def __get_quantum_kernel(self, num_qubits: int):
+    def __get_quantum_kernel(
+        self, num_qubits: int
+    ) -> Callable[[ArrayLike, ArrayLike], ArrayLike]:
         device = pln.device("default.qubit", wires=num_qubits)
 
         @pln.qnode(device)
@@ -113,7 +115,7 @@ class QuantumSVM(BaseClassifier):
 
         return kernel
 
-    def __check_invalid_feature_count(self, X: Dataset):
+    def __check_invalid_feature_count(self, X: Dataset) -> None:
         if X.shape[1] != self.num_features:
             raise ValueError(
                 f"Number of features in data ({X.shape[1]}) "
