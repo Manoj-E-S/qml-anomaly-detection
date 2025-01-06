@@ -97,10 +97,10 @@ class BaseClassifier(ABC):
     def predict(self, X: Dataset) -> ArrayLike:
         pass
 
-    def __handle_data_split(
+    def _handle_data_split(
         self, X_train_or_data: Dataset, y_train_or_target: ArrayLike | str
     ) -> tuple[pd.DataFrame, pd.Series]:
-        if isinstance(y_train, str):
+        if isinstance(y_train_or_target, str):
             X_train = X_train_or_data.drop(y_train_or_target, axis=1)
             y_train = X_train_or_data[y_train_or_target]
             return X_train, y_train
