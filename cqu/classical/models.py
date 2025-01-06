@@ -1,5 +1,5 @@
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from typing import Dict
+from typing import Dict, Tuple
 
 import numpy as np
 import pandas as pd
@@ -17,34 +17,10 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.preprocessing import StandardScaler
 from xgboost import XGBClassifier
 
+from cqu.classical.helpers import CustomVotingClassifier, FraudDetectionNN
+from cqu.typing import ClassicalModels, ClassicalModelTypes
 from cqu.utils.classifier import _optimize_threshold
 from cqu.utils.metrics import ClassifierMetrics, get_metrics
-
-from . import ClassicalModels, ClassicalModelTypes
-
-
-class FraudDetectionNN(nn.Module):
-    def __init__(self, input_size):
-        super(FraudDetectionNN, self).__init__()
-
-        self.layers = nn.Sequential(
-            nn.Linear(input_size, 64),  # Input Layer
-            nn.ReLU(),  # Activation
-            nn.BatchNorm1d(64),  # Batch Normalization
-            nn.Dropout(0.3),  # Dropout Layer to prevent overfitting
-            nn.Linear(64, 32),  # Hidden Layer 1
-            nn.ReLU(),  # Activation
-            nn.BatchNorm1d(32),  # Batch Normalization
-            nn.Dropout(0.2),  # Dropout Layer
-            nn.Linear(32, 16),  # Hidden Layer 2
-            nn.ReLU(),  # Activation
-            nn.BatchNorm1d(16),  # Batch Normalization
-            nn.Linear(16, 1),  # Output Layer
-            nn.Sigmoid(),  # Sigmoid activation for binary classification
-        )
-
-    def forward(self, x):
-        return self.layers(x)
 
 
 def _test_train_split_helper(
@@ -441,16 +417,8 @@ def ensemble_model_with_analysis(
         data, feature_importances, target_column, random_state
     )
 
-    voting_clf = VotingClassifier(
-        estimators=[(model_name.name, model) for model_name, model in models.items()],
-        voting="soft",  # 'soft' voting uses predicted probabilities to make decisions
-    )
-
-    sample_weights = None
-    if class_weights is not None:
-        sample_weights = np.array([class_weights[int(y)] for y in y_train])
-
-    voting_clf.fit(X_train, y_train, sample_weight=sample_weights)
+    voting_clf = CustomVotingClassifier(models=models, threshold=threshold)
+    voting_clf.fit(X_train, y_train, class_weights=class_weights)
 
     y_proba = voting_clf.predict_proba(X_test)[:, 1]
 
@@ -471,7 +439,7 @@ def get_the_best_classical_model(
     n_neighbors_for_knn: int = 5,
     class_weights: Dict[int | str, int | float] | None = None,
     parallel: bool = True,
-) -> ClassicalModelTypes:
+) -> Tuple[ClassicalModelTypes, float]:
     """
     Train and evaluate multiple classical ML models on the given dataset and return the best model.
 
@@ -486,7 +454,7 @@ def get_the_best_classical_model(
     - parallel (bool): Whether to run the model training and evaluation in parallel.
 
     Returns:
-    - the_best_model: The classical model with the highest F1-score.
+    - Tuple[the_best_model, its_f1_score]: The classical model with the highest F1-score.
     """
     models = {
         ClassicalModels.LOGISTIC_REGRESSION: LogisticRegression(
@@ -501,7 +469,7 @@ def get_the_best_classical_model(
             / (data[target_column] == 1).sum(),
             eval_metric="logloss",
         ),
-        ClassicalModels.NEURAL_NETWORK: FraudDetectionNN(data.shape[1]),
+        ClassicalModels.NEURAL_NETWORK: FraudDetectionNN(data.shape[1] - 1),
         ClassicalModels.KNN: KNeighborsClassifier(
             n_neighbors=n_neighbors_for_knn, weights="distance"
         ),
@@ -524,7 +492,6 @@ def get_the_best_classical_model(
             if (
                 model_name == ClassicalModels.KNN
             ):  # Special case for KNN which requires `n_neighbors`
-                print("KNN")
                 metrics[model_name] = analizer(
                     data=data,
                     target_column=target_column,
@@ -536,16 +503,8 @@ def get_the_best_classical_model(
             elif (
                 model_name == ClassicalModels.ENSEMBLE
             ):  # Ensemble Model has `models` and `class_weights`
-                print("Ensemble")
                 metrics[model_name] = analizer(
-                    models={
-                        ClassicalModels.LOGISTIC_REGRESSION: models[
-                            ClassicalModels.LOGISTIC_REGRESSION
-                        ],
-                        ClassicalModels.RANDOM_FOREST: models[
-                            ClassicalModels.RANDOM_FOREST
-                        ],
-                    },  # models
+                    models=models,  # models
                     data=data,
                     target_column=target_column,
                     feature_importances=feature_importances[
@@ -556,7 +515,6 @@ def get_the_best_classical_model(
                     class_weights=class_weights,  # class_weights
                 )
             else:  # General case for other models
-                print("General")
                 metrics[model_name] = analizer(
                     data=data,
                     target_column=target_column,
@@ -564,6 +522,7 @@ def get_the_best_classical_model(
                     random_state=random_state,
                     threshold=threshold,
                 )
+            print(metrics[model_name])
 
     else:
         metrics = {}
@@ -573,7 +532,6 @@ def get_the_best_classical_model(
                 if (
                     model_name == ClassicalModels.KNN
                 ):  # Special case for KNN which requires `n_neighbors`
-                    print("KNN")
                     futures[
                         executor.submit(
                             analizer,
@@ -588,18 +546,10 @@ def get_the_best_classical_model(
                 elif (
                     model_name == ClassicalModels.ENSEMBLE
                 ):  # Ensemble Model has `models` and `class_weights`
-                    print("Ensemble")
                     futures[
                         executor.submit(
                             analizer,
-                            models={
-                                ClassicalModels.LOGISTIC_REGRESSION: models[
-                                    ClassicalModels.LOGISTIC_REGRESSION
-                                ],
-                                ClassicalModels.RANDOM_FOREST: models[
-                                    ClassicalModels.RANDOM_FOREST
-                                ],
-                            },  # models
+                            models=models,  # models
                             data=data,
                             target_column=target_column,
                             feature_importances=feature_importances[
@@ -611,7 +561,6 @@ def get_the_best_classical_model(
                         )
                     ] = model_name
                 else:  # General case for other models
-                    print("General")
                     futures[
                         executor.submit(
                             analizer,
@@ -632,6 +581,8 @@ def get_the_best_classical_model(
                 except Exception as e:
                     print(f"ERROR PROCESSING {model_name}\n: {e}")
 
-    best_model = max(metrics, key=lambda x: metrics[x].get_report()["1"]["f1-score"])
+    best_model = max(
+        metrics, key=lambda x: metrics[x].get_report()["macro avg"]["f1-score"]
+    )
 
-    return models[best_model]
+    return models[best_model], metrics[best_model].get_report()["macro avg"]["f1-score"]

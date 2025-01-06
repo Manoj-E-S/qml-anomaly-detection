@@ -88,7 +88,7 @@ if __name__ == "__main__":
         features = data["feature"]
         print(f"{model}\n = {features}")
 
-    best_model = get_the_best_classical_model(
+    best_model, best_f1_score = get_the_best_classical_model(
         df, target_column, feature_importances, parallel=True
     )
-    print(f"Best Model: {best_model}")
+    print(f"Best Model: {best_model} | F1-Score: {best_f1_score}")
