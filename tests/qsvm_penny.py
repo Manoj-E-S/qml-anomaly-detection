@@ -29,7 +29,7 @@ def reduce_dataset(dataset: pd.DataFrame, total_rows, class_1_rows) -> pd.DataFr
 print("Loading dataset...")
 cqp = Preprocessor("./datasets/ccfraud/creditcard.csv")
 
-df = reduce_dataset(cqp.dataframe, 2150, 150)
+df = reduce_dataset(cqp.dataframe, 1800, 200)
 df = df[["v17", "v12", "v14", "v16", "v10", "class"]]
 
 X = df.drop("class", axis=1)
@@ -73,9 +73,6 @@ def create_fast_kernel(num_qubits):
         # Convert to arrays if not already
         A = np.asarray(A)
         B = np.asarray(B)
-
-        # Print shape for debugging
-        print(f"Computing kernel matrix of shape: {(len(A), len(B))}")
 
         kernel_matrix = np.zeros((len(A), len(B)))
 
