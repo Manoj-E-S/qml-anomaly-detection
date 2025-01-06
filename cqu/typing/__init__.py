@@ -17,5 +17,9 @@ class ClassicalModels(Enum):
     NAIVE_BAYES = "naive_bayes"
 
 
-ModelType: TypeAlias = ClassicalModels | str
+class QuantumModels(Enum):
+    QSVM = "qsvm"
+
+
+ModelType: TypeAlias = ClassicalModels | QuantumModels | str
 Dataset: TypeAlias = ArrayLike | pd.DataFrame

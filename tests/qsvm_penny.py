@@ -29,7 +29,7 @@ def reduce_dataset(dataset: pd.DataFrame, total_rows, class_1_rows) -> pd.DataFr
 print("Loading dataset...")
 cqp = Preprocessor("./datasets/ccfraud/creditcard.csv")
 
-df = reduce_dataset(cqp.dataframe, 1800, 200)
+df = reduce_dataset(cqp.dataframe, 100, 10)
 df = df[["v17", "v12", "v14", "v16", "v10", "class"]]
 
 X = df.drop("class", axis=1)
@@ -98,15 +98,10 @@ qsvm = SVC(
 qsvm.fit(X_train, y_train)
 print(f"Training took {time() - start_time:.2f} seconds")
 
-print("Tiling data for prediction...")
-X_test = np.tile(X_test, (X_train.shape[0] // X_test.shape[0], 1))
-
 print("Predicting...")
 start_time = time()
 y_proba = qsvm.predict_proba(X_test)[:, 1]
 print(f"Prediction took {time() - start_time:.2f} seconds")
-
-y_proba = y_proba[: len(y_test)]
 
 from cqu.classical.models import _optimize_threshold
 
