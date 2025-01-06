@@ -10,15 +10,14 @@ Provided abstract methods:
 """
 
 from abc import ABC, abstractmethod
-from typing import TypeAlias, overload
+from typing import overload
 
-import numpy as np
 import pandas as pd
 from numpy.typing import ArrayLike
 
-from .metrics import ClassifierMetrics
+from cqu.typing import Dataset
 
-Dataset: TypeAlias = ArrayLike | pd.DataFrame
+from .metrics import ClassifierMetrics
 
 
 class BaseClassifier(ABC):
