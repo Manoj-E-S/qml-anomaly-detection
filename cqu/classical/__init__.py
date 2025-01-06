@@ -13,15 +13,7 @@ b. To be able to select important features
 
 from enum import Enum
 
-
-class ClassicalModels(Enum):
-    LOGISTIC_REGRESSION = "logistic_regression"
-    RANDOM_FOREST = "random_forest"
-    GRADIENT_BOOSTING = "gradient_boosting"
-    NEURAL_NETWORK = "neural_network"
-    KNN = "knn"
-    NAIVE_BAYES = "naive_bayes"
-
+from cqu.typing import ClassicalModels
 
 from .important_features import (
     get_feature_importances,

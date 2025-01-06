@@ -10,7 +10,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.naive_bayes import GaussianNB
 from sklearn.neural_network import MLPClassifier
 
-from cqu.utils.classifier import Dataset
+from cqu.typing import Dataset
 
 from . import ClassicalModels
 
