@@ -7,7 +7,19 @@ from typing import TypeAlias
 import pandas as pd
 from numpy.typing import ArrayLike
 
-from cqu.classical import ClassicalModels
 
-ModelType: TypeAlias = ClassicalModels | str
+class ClassicalModels(Enum):
+    LOGISTIC_REGRESSION = "logistic_regression"
+    RANDOM_FOREST = "random_forest"
+    GRADIENT_BOOSTING = "gradient_boosting"
+    NEURAL_NETWORK = "neural_network"
+    KNN = "knn"
+    NAIVE_BAYES = "naive_bayes"
+
+
+class QuantumModels(Enum):
+    QSVM = "qsvm"
+
+
+ModelType: TypeAlias = ClassicalModels | QuantumModels | str
 Dataset: TypeAlias = ArrayLike | pd.DataFrame

@@ -17,6 +17,7 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.preprocessing import StandardScaler
 from xgboost import XGBClassifier
 
+from cqu.utils.classifier import _optimize_threshold
 from cqu.utils.metrics import ClassifierMetrics, get_metrics
 
 from . import ClassicalModels, ClassicalModelTypes
@@ -44,48 +45,6 @@ class FraudDetectionNN(nn.Module):
 
     def forward(self, x):
         return self.layers(x)
-
-
-def _optimize_threshold(
-    y_proba: ArrayLike, y_test: ArrayLike, step: float = 0.01, use_roc: bool = False
-) -> float:
-    """
-    Find the optimal threshold that maximizes the F1-score for class 1.
-
-    Parameters:
-        y_proba (array): Predicted probabilities for the positive class.
-        y_test (array): Ground truth labels.
-        step (float): Increment for threshold adjustment.
-
-    Returns:
-        dict: Dictionary containing the optimal threshold, corresponding F1-score, and the classification report.
-    """
-
-    if use_roc:
-        threshold = None
-        fpr, tpr, thresholds = roc_curve(y_test, y_proba)
-        gmeans = (tpr * (1 - fpr)) ** 0.5
-        optimal_idx = gmeans.argmax()
-        return thresholds[optimal_idx]
-
-    best_threshold = 0.0
-    best_f1_score = 0.0
-
-    # Iterate through thresholds from 0.0 to 1.0 with the given step size
-    for threshold in [x * step for x in range(int(1 / step) + 1)]:
-        y_pred = (y_proba >= threshold).astype(int)
-
-        report = classification_report(
-            y_test, y_pred, output_dict=True, zero_division=0
-        )
-        f1 = report["1"]["f1-score"]
-
-        # Update best threshold if this F1 is better
-        if f1 > best_f1_score:
-            best_f1_score = f1
-            best_threshold = threshold
-
-    return best_threshold
 
 
 def _test_train_split_helper(
