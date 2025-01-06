@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Callable, Dict
 
 import numpy as np
 import pennylane as pln
@@ -21,13 +21,18 @@ class QuantumSVM(BaseClassifier):
         self,
         num_features: int,
         class_weight: Dict[int | str, int] | str | None = None,
-        random_state=42,
-        test_size=0.2,
+        random_state: int = 42,
+        test_size: float = 0.2,
+        custom_kernal: Callable[[ArrayLike, ArrayLike], ArrayLike] | None = None,
     ):
         self.num_features = num_features
         self.threshold = None
         self.scaler = MaxAbsScaler()
-        qkernel = self.__get_quantum_kernel(num_qubits=self.num_features)
+        qkernel = (
+            custom_kernal
+            if custom_kernal is not None
+            else self.__get_quantum_kernel(num_qubits=self.num_features)
+        )
         self.qsvm = SVC(
             kernel=qkernel,
             probability=True,
